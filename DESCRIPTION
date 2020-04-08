@@ -1,0 +1,25 @@
+Package: nmarank
+Type: Package
+Title: Precision in treatment ranking
+Version: 0.1.0
+Date: 2020-04-08
+Authors@R: c( person("Adriani", "Nikolakopoulou",
+                    role = c("aut", "cre"),
+                    email = "nikolakopoulou.adriani@gmail.com"
+                    )
+            , person("Theodoros", "Papakonstantinou",
+                    role = c("aut"),
+                    comment = c(ORCID = "0000-0002-6630-6817"))
+            )
+Description: Provides probability matrix of the most frequent treatment rankings
+  by simulating the multivariate normal of the NMA effect sizes. netmeta package is used for analysis.
+License: GPL-3
+LazyLoad: Yes
+Depends: R (>= 3.3.1)
+       , netmeta (>= 1.0-1)
+       , data.tree
+Suggests: 
+    alternativenma,
+    testthat
+Encoding: UTF-8
+RoxygenNote: 6.1.1
