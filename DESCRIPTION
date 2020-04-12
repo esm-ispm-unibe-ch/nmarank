@@ -18,6 +18,8 @@ LazyLoad: Yes
 Depends: R (>= 3.3.1)
        , netmeta (>= 1.0-1)
        , data.tree
+       , mvtnorm
+       , devtools
 Suggests: 
     alternativenma,
     testthat

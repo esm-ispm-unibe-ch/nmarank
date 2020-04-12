@@ -6,7 +6,6 @@
 
 metrics=function(precobject,hierarchy){
   
-  
   if (!inherits(precobject, "precranking"))
     stop("Argument 'precobject' must be an object of class \"precranking\"")
 

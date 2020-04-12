@@ -1,19 +1,26 @@
-###################################################################################################
-#                   A function to measure precision in treatment hierarchy
-###################################################################################################
-#       Arguments:
-#netmetaobject: An object of class netmeta
-#random: A logical indicating whether a random effects meta-analysis should be conducted.
-#no_most_prob: number of most probable hierarchies, only applicable if most_prob
-#nsim: number of simulations
-#small.values: A character string specifying whether small treatment effects indicate a "good" or "bad" effect
-###################################################################################################
+#' Precision of treatment ranking
+#'
+#' The function \code{\link{precranking}} gives the probabilities of treatment
+#' hierarchies of network meta-analysis. 
+#'
+#' @import netmeta mvtnorm devtools
+#'
+#' @param netmetaobject An object of class \code{\link{netmeta}}
+#' @param random A logical indicating whether a random effects meta-analysis should be conducted.
+#' @param no_most_prob number of most probable hierarchies, only applicable if most_prob
+#' @param nsim number of simulations
+#' @param small.values A character string specifying whether small treatment effects indicate a "good" or "bad" effect
+#'
+#' @return The main result is the \code{Output} is the list of rankings as lists of treatments and
+#' their probabilites
+#'
 
-precranking = function (netmetaobject,random=T,no_most_prob=5,nsim=1000,small.values="good")
+precranking = function( netmetaobject
+                      , random=T
+                      , no_most_prob=5
+                      , nsim=1000
+                      , small.values="good")
 {
-  require(netmeta)
-  require(devtools)
-  require(mvtnorm)
 
   if(random==T) {
     TE <- netmetaobject$TE.random
@@ -61,5 +68,3 @@ precranking = function (netmetaobject,random=T,no_most_prob=5,nsim=1000,small.va
 
   res  
   }
-  
-  
