@@ -21,6 +21,13 @@ precranking = function( netmetaobject
                       , nsim=1000
                       , small.values="good")
 {
+#   
+# netmetaobject=net1
+# random=T
+# no_most_prob=5
+# nsim=1000
+# small.values="good"
+
 
   if(random==T) {
     TE <- netmetaobject$TE.random
@@ -48,16 +55,28 @@ precranking = function( netmetaobject
   resultsall=sapply(1:nsim,function(x) rbind(paste(rankings[[x]],collapse=" ")))
   resultsum=as.data.frame(table(resultsall))
 
-  resultsum$Probability=resultsum$Freq/sum(resultsum$Freq)
-  colnames(resultsum)=c(paste(names(rankings[[1]]),collapse = " "),"N","Probability")
+  resultsum$Probability = resultsum$Freq/sum(resultsum$Freq)
+  referenceRank = data.frame(treatments = names(rankings[[1]])) %>% mutate(id=1:n())
+  
+  colnames(resultsum)=c(paste(referenceRank$treatments,collapse = " "),"N","Probability")
   
   mylist=lapply(resultsum[,1], function(x) unlist(strsplit(as.character(x), " ", fixed = TRUE)))
   resultsum$myresult=mylist
   
-  treatnames=unlist(strsplit(names(resultsum)[1], " ", fixed = TRUE))
-  mynameslist=lapply(1:nrow(resultsum), FUN=function(x) {return(as.character(treatnames[as.numeric(mylist[[x]])]))})
+  mynameslist=lapply(mylist, FUN=function(x) {
+    positions = as.numeric(x)
+    treatments = Reduce(function(i,ac){
+      ac[positions[i]]=referenceRank$treatments[i]
+      print("ac",ac)
+      return(ac)}
+      ,referenceRank$treatments,c(1:length(positions))
+      )
+    res = treatments
+    print(c("x,res",x,res))
+    return(paste(res,sep=","))})
 
-  resultsum$Hierarchy=mynameslist
+  resultsum = resultsum %>% mutate(Hierarchy=mynameslist)
+  print(resultsum)
   
   Output=resultsum[,c("Hierarchy","Probability")][order(-resultsum[,c("Hierarchy","Probability")]$Probability),]
   

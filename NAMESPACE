@@ -3,6 +3,7 @@
 export(probabilityOfSelection)
 export(retainOrder)
 export(treatementInSpecificPosition)
+export(precranking)
 import(data.tree)
 import(devtools)
 import(mvtnorm)

@@ -20,6 +20,7 @@ Depends: R (>= 3.3.1)
        , data.tree
        , mvtnorm
        , devtools
+       , dplyr
 Suggests: 
     alternativenma,
     testthat
