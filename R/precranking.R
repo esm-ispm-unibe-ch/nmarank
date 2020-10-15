@@ -17,8 +17,8 @@
 
 precranking = function( netmetaobject
                       , random=T
-                      , no_most_prob=5
-                      , nsim=1000
+                      , no_most_prob=NA
+                      , nsim=10000
                       , small.values="good")
 {
 #   
@@ -67,18 +67,15 @@ precranking = function( netmetaobject
     positions = as.numeric(x)
     treatments = Reduce(function(i,ac){
       ac[positions[i]]=referenceRank$treatments[i]
-      print("ac",ac)
       return(ac)}
       ,referenceRank$treatments,c(1:length(positions))
       )
     res = treatments
-    print(c("x,res",x,res))
     return(paste(res,sep=","))})
 
   resultsum = resultsum %>% mutate(Hierarchy=mynameslist)
-  print(resultsum)
   
-  Output=resultsum[,c("Hierarchy","Probability")][order(-resultsum[,c("Hierarchy","Probability")]$Probability),]
+  Output=resultsum[,c("Hierarchy","Probability")][order(-as.numeric(resultsum[,c("Hierarchy","Probability")]$Probability)),]
   
   if (!is.na(no_most_prob)) Output=head(Output,no_most_prob)
   

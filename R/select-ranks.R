@@ -18,7 +18,6 @@ probabilityOfSelection = function(rankPrecisions, predicateTree){
   }
   probs = Reduce(function(acc, i){
       holds = selectionHolds(predicateTree,ranks$Hierarchy[[i]])
-      print(holds)
       if(holds){
         out = acc+ranks$Probability[[i]]
       }else{
