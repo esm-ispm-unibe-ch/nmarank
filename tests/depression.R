@@ -3,7 +3,7 @@ rm(list=ls())
 data(depression)
 p1=pairwise(treat=drug_name,event=Responders,n=Ntotal,data=depression,studlab = studyID, sm="OR")
 netp1=netmeta(p1)
-ranks = precranking(netp1,nsim=40000,small.values = "bad")
+ranks = precranking(netp1,nsim=1000,small.values = "bad")
 View(ranks$Output)
 write.csv(head(ranks$Output,10) %>% mutate(Hierarchy = sapply(Hierarchy,function(h){return(paste(unlist(h),collapse=", "))})), "depressionRanks.csv")
 

@@ -21,12 +21,6 @@ precranking = function( netmetaobject
                       , nsim=10000
                       , small.values="good")
 {
-#   
-# netmetaobject=net1
-# random=T
-# no_most_prob=5
-# nsim=1000
-# small.values="good"
 
 
   if(random==T) {
@@ -54,6 +48,7 @@ precranking = function( netmetaobject
   
   resultsall=sapply(1:nsim,function(x) rbind(paste(rankings[[x]],collapse=" ")))
   resultsum=as.data.frame(table(resultsall))
+  print(resultsum)
 
   resultsum$Probability = resultsum$Freq/sum(resultsum$Freq)
   referenceRank = data.frame(treatments = names(rankings[[1]])) %>% mutate(id=1:n())
@@ -65,10 +60,12 @@ precranking = function( netmetaobject
   
   mynameslist=lapply(mylist, FUN=function(x) {
     positions = as.numeric(x)
-    treatments = Reduce(function(i,ac){
-      ac[positions[i]]=referenceRank$treatments[i]
+    numpositions = as.numeric(c(1:length(positions)))
+    treatments = Reduce(function(ac,i){
+      pos = referenceRank$treatments[i]
+      ac[positions[i]]=pos
       return(ac)}
-      ,referenceRank$treatments,c(1:length(positions))
+      ,numpositions,c()
       )
     res = treatments
     return(paste(res,sep=","))})
@@ -81,6 +78,6 @@ precranking = function( netmetaobject
   
   res <- list(resultsum=resultsum,Output=Output,rankings=rankings,netmetaobject=netmetaobject,random=random,small.values=small.values)
   class(res) <- "precranking"
-
+ print(res)
   res  
   }
