@@ -10,6 +10,25 @@
 #'
 #' @return probability of selected hierarchies
 #'
+#' @examples
+#' data("Woods2010")
+#' 
+#' p1 <- pairwise(treatment, event = r, n = N,
+#'  studlab = author, data = Woods2010, sm = "OR")
+#' net1 <- netmeta(p1)
+#' net1
+#' 
+#' prec1=precranking(netmetaobject=net1, random=F, no_most_prob=NA, nsim=10000, small.values = "bad")
+#'
+#' A = list(fn = "retainOrder", args = c("Placebo", "SFC", "Salmeterol"))
+#' p1 = probabilityOfSelection(prec1, A)
+#' p1 
+#' B = list(fn = "retainOrder", args = c("Placebo",  "Salmeterol", "SFC"))
+#' p2 = probabilityOfSelection(prec1, B)
+#' p2
+#' p3 = probabilityOfSelection(prec1, (B %AND% A))
+#' p3
+#'
 #' @export 
 probabilityOfSelection = function(rankPrecisions, predicateTree){
   ranks = rankPrecisions$Output;

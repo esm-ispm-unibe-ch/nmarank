@@ -48,7 +48,7 @@ precranking = function( netmetaobject
   
   resultsall=sapply(1:nsim,function(x) rbind(paste(rankings[[x]],collapse=" ")))
   resultsum=as.data.frame(table(resultsall))
-  print(resultsum)
+  #print(resultsum)
 
   resultsum$Probability = resultsum$Freq/sum(resultsum$Freq)
   referenceRank = data.frame(treatments = names(rankings[[1]])) %>% mutate(id=1:n())
@@ -78,6 +78,6 @@ precranking = function( netmetaobject
   
   res <- list(resultsum=resultsum,Output=Output,rankings=rankings,netmetaobject=netmetaobject,random=random,small.values=small.values)
   class(res) <- "precranking"
- print(res)
+ #print(res)
   res  
   }
