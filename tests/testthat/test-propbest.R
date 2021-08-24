@@ -9,17 +9,14 @@ pbestData = data.frame(studlab=(1:3)
 net1 = netmeta(studlab=studlab,TE=TE,seTE=seTE,treat1=treat1,treat2=treat2,
                data=pbestData)
 
-prec1=precranking(netmetaobject=net1,random=F, no_most_prob=NA, nsim=10000,small.values = "bad")
-
 A = list(fn = "retainOrder", args = c("A", "B"))
-p1 = probabilityOfSelection(prec1, A)
+p1 = nmarank(x=net1,predicate=A)$probabilityOfSelection
 B = list(fn = "retainOrder", args = c("A", "C"))
-p2 = probabilityOfSelection(prec1, B)
+p2 = nmarank(x=net1,predicate=B)$probabilityOfSelection
 C = list(fn = "retainOrder", args = c("C", "B"))
-p3 = probabilityOfSelection(prec1, C)
+p3 = nmarank(x=net1,predicate=C)$probabilityOfSelection
 
 test_that("probability of A > B should be the same as A < C",{
-  print(p1,p2)
   expect_lt(p1-p2, 0.01)
   expect_lt(p1-p3, 0.01)
 })
