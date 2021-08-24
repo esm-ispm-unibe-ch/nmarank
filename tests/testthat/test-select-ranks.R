@@ -7,8 +7,6 @@ p1 <- pairwise(treatment, event = r, n = N,
 net1 <- netmeta(p1)
 net1
 
-prec1=precranking(netmetaobject=net1, random=F, no_most_prob=NA, nsim=10000, small.values = "bad")
-
 A = list(fn = "retainOrder", args = c("Placebo", "Salmeterol", "SFC"))
 B = list(fn = "treatementInSpecificPosition", args = list("Placebo", 1))
 C = list(fn = "isthesamerank", args = c("Placebo", "Fluticasone", "Salmeterol", "SFC"))
@@ -22,28 +20,26 @@ test_that("Build selection tree", {
                )
 })
 
-test_that("check Selection", {
+test_that("check Selection tree", {
   st = (A %OR% (B %XOR% (C %OR% (D %AND% G))))
   st1 = (B %XOR% (C %OR% (D %AND% G))) %OR% A
-  ranksrow = c("Placebo", "Salmeterol", "Fluticasone", "SFC")
-  holds = selectionHolds(st, ranksrow)
+  effs <- prepareNMAEffects(net1$TE.random
+                          ,net1$Cov.random)
+  ranksrow = effs$TE
+  holds = selectionHolds(st, small.values="good", ranksrow)
   expect_true(holds)
-  expect_equal(selectionHolds(st,ranksrow),selectionHolds(st1,ranksrow))
+  expect_equal(selectionHolds(st, small.values="good", ranksrow),
+               selectionHolds(st1, small.values="good", ranksrow))
 })
 
 test_that("Commutative selections", {
-  st1 = (A %OR% (B %XOR% (C %OR% (D %AND% G))))
-  st2 = (B %XOR% (C %OR% (D %AND% G))) %OR% A
-  p1 = probabilityOfSelection(prec1, st1)
-  p2 = probabilityOfSelection(prec1, st2)
-  expect_equal(p1, p2)
+  st = (B %XOR% (C %OR% (D %AND% G))) %OR% A
+  st1 = st %AND% G
+  p1 = nmarank(x=net1, predicate=st1)$probabilityOfSelection
+  expect_type(p1, "double")
 })
 
-# skj = probabilityOfSelection(prec1, list(list("Placebo",3), treatementInSpecificPosition))
-# 
-# print(skj)
-# 
-# kkj = probabilityOfSelection(prec1, list(c("SFC","Placebo"), retainOrder))
-# 
-# print(kkj)
-
+test_that("test opposite (not) function", {
+  p1 = nmarank(x=net1,predicate=(B %AND% opposite(B)))$probabilityOfSelection
+  expect_equal(p1, 0)
+})

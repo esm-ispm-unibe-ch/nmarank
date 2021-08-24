@@ -12,7 +12,10 @@ Authors@R: c( person("Adriani", "Nikolakopoulou",
                     comment = c(ORCID = "0000-0002-6630-6817"))
             )
 Description: Provides probability matrix of the most frequent treatment rankings
-  by simulating the multivariate normal of the NMA effect sizes. netmeta package is used for analysis.
+  by sampling the multivariate normal of the NMA effect sizes. One can also
+  describe complex selection ranking criteria through a simple syntax and basic
+  functions introduced and calculate their probability. Netmeta
+  can be used for analysis or an existing league table can be provided.
 License: GPL-3
 LazyLoad: Yes
 Depends: R (>= 3.3.1)
@@ -21,6 +24,7 @@ Depends: R (>= 3.3.1)
        , mvtnorm
        , devtools
        , dplyr
+       , tidyverse
 Suggests: 
     alternativenma,
     testthat

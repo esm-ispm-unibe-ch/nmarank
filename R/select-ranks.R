@@ -1,77 +1,51 @@
-#' Probability of selected rankings
-#'
-#' Functions for quering treatment hierarchies probability
-#'
-#' @import data.tree
-#'
-#' @param rankPrecisions the output of \code{\link{precranking}}
-#' @param predicateTree is the tree representing the criteria specified by
-#' logical functions.
-#'
-#' @return probability of selected hierarchies
-#'
-#' @export 
-probabilityOfSelection = function(rankPrecisions, predicateTree){
-  ranks = rankPrecisions$Output;
-  if(is.null(predicateTree$root)){
-    predicateTree = makeNode(predicateTree)
-  }
-  probs = Reduce(function(acc, i){
-      holds = selectionHolds(predicateTree,ranks$Hierarchy[[i]])
-      if(holds){
-        out = acc+ranks$Probability[[i]]
-      }else{
-        out = acc
-      }
-      return(out)
-    }, 1:nrow(ranks), 0)
-  return (probs)
+
+#' returnAlways true for default predicate
+#' @export
+alwaysTrue = function(args, small.values, leagueTable){
+  return(T)
 }
 
-#' Probability of selected rankings
+#' Treatment difference bigger than a given Clinically Important Value
 #'
-#' Functions for quering treatment hierarchies probability
+#' Checks whether the effect of the first treatment is bigger than the second by
+#' more than the given CIV.
+#' The function does not take into account the \code{small.values=bad/good} 
+#' argument. 
 #'
-#' @import data.tree
+#' @param civ (Clinicaly Important Value) is an optional argument 
+#' of type list(treatBig, treatSmall, threshold) where
+#' hierarchies fulfilling condition \code{treatBig - treatSmall > civ}  will
+#' be recorded. This is a prerequisite for using the \code{isbiggerCIV}
+#' helper function in the \code{propabilityOfSelection}
+#' @param treatBigger the name of the treatment with the bigger absolute effect
+#' irrespective of whether it is considered bad or good
 #'
-#' @param rankPrecisions the output of \code{\link{precranking}}
-#' @param predicateTree is the tree representing the criteria specified by
-#' logical functions.
-#'
-#' @return probability of selected hierarchies
-#'
-#' @export 
-selectionHolds = function(node, rankprobsrow){
-   if(node$operation == "function"){
-     return(get(node$fn)(node$args, rankprobsrow))
-   }else{
-     if(node$fn=="AND"){
-       return(
-         all(sapply(node$children, 
-                    function(x){
-                      return(selectionHolds(x, rankprobsrow))
-                    })
-         )
-       )
-     }else{
-       if(node$fn=="OR"){
-         return(
-           any(sapply(node$children, 
-                      function(x){
-                        return(selectionHolds(x, rankprobsrow))
-                      }
-                     )
-              )
-           )
-       }
-       if(node$fn=="XOR"){
-         return(
-           xor( selectionHolds(node$children[[1]], rankprobsrow)
-              , selectionHolds(node$children[[2]], rankprobsrow))
-           )
-       }
-     }
-   }
+#' @return True / False
+#' 
+#' @param civ (Clinicaly Important Value) is an optional argument 
+#' of type list(treatBig, treatSmall, threshold) where
+#' hierarchies fulfilling condition \code{treatBig - treatSmall > civ}  will
+#' be recorded. 
+#' 
+isbiggerCIV = function(args, small.values, leagueTable){
+  thecheck <- leagueTable[args[[2]],args[[1]]] > args[[3]]
+  return(thecheck)
+}
+
+#' Treatment hierarchy from smaller to bigger from the league table
+#' 
+#' @param leagueTable is a table like the one exported by the 
+#' \code{prepareNMAEffects} {$TE} object
+#' @return a vector of treatment names
+#' 
+#' @export
+rankFromLeagueTable = function(small.values, leagueTable){
+  if(small.values == "bad"){
+    res <- sort(leagueTable[1,], decreasing = T) %>% names() 
+  }else{
+    res <- sort(leagueTable[1,]) %>% names() 
+  }
+  return(res)
 }
 
 #' Ranks are equal
@@ -82,8 +56,9 @@ selectionHolds = function(node, rankprobsrow){
 #' @param rankProbabilityRow the rank from the \code{\link{precranking}} row output
 #'
 #' @return True / False
-isthesamerank = function(ranklist, rankProbabilityRow){
- out = all(rankProbabilityRow==ranklist)
+isthesamerank = function(ranklist, small.values, leagueTable){
+ rank <- rankFromLeagueTable(small.values, leagueTable)
+ out = all(rank==ranklist)
  return(out)
 }
 
@@ -97,10 +72,11 @@ isthesamerank = function(ranklist, rankProbabilityRow){
 #' @return True / False
 #'
 #' @export 
-treatementInSpecificPosition = function(treatpos,rankProbabilityRow){
+treatementInSpecificPosition = function(treatpos, small.values, leagueTable){
+  rank <- rankFromLeagueTable(small.values, leagueTable)
   treat = treatpos[[1]]
   position = treatpos[[2]]
-  out = rankProbabilityRow[[position]] == treat
+  out = rank[[position]] == treat
  return(out)
 }
 
@@ -118,8 +94,9 @@ treatementInSpecificPosition = function(treatpos,rankProbabilityRow){
 #'  retainOrder(list("Placebo", "SFC", "salmeterol"), precisionsRow)
 #'
 #' @export 
-retainOrder = function(treatments,rankProbabilityRow){
-  indexes = match(treatments,rankProbabilityRow)
+retainOrder = function(treatments, small.values, leagueTable){
+  rank <- rankFromLeagueTable(small.values, leagueTable)
+  indexes = match(treatments, rank)
   return(!is.unsorted(indexes))
 }
 
@@ -127,80 +104,10 @@ retainOrder = function(treatments,rankProbabilityRow){
 #'
 #' @param treatpos a  list with the treatment and posistion
 #' @export 
-betterEqual = function(treatpos,rankProbabilityRow){
+betterEqual = function(treatpos, small.values, leagueTable){
   treat = treatpos[[1]]
   position = treatpos[[2]]
-  out = match(treat,rankProbabilityRow)
+  rank <- rankFromLeagueTable(small.values, leagueTable)
+  out = match(treat, rank)
   return(out <= position)
-}
-
-makeID = function(op) {
-  return(paste(op, as.character(floor(runif(1,0,1)*10000)), sep="_"))
-}
-
-makeNode = function(selectionList) {
-  if(is.null(selectionList$root)){
-  selectionList$id = makeID(as.character(selectionList$fn))
-  selectionList$operation = "function"
-  out = FromListExplicit(selectionList,nameName="id")
-  }
-  else{
-    out = selectionList
-    }
-  return(out)
-}
-
-#' Combine selections with AND
-#'
-#' @param selections as list. Each selection comprises of a list with the
-#' function and its arguments
-#'
-#' @return data.tree
-#'
-#' @examples
-#' A = list(fn = "retainOrder", args = c("Placebo", "Salmeterol", "SFC"))
-#' B = list(fn = "retainOrder", args = c("Placebo", "Salmeterol", "SFC"))
-#' A %AND% B
-#'
-#' @export 
-`%AND%` = function(A,B) {
-  nl = list( id = makeID("AND")
-             , fn ="AND"
-             , arguments = {}
-             , operation = "combinator"
-             )
-  nodeout = FromListExplicit(nl,nameName="id")
-  nodeA = makeNode(A)
-  nodeB = makeNode(B)
-  nodeout$AddChildNode(nodeA)
-  nodeout$AddChildNode(nodeB)
-  return(nodeout)
-}
-
-`%OR%` = function(A,B) {
-  nl = list( id = makeID("OR")
-             , fn ="OR"
-             , arguments = {}
-             , operation = "combinator"
-             )
-  nodeout = FromListExplicit(nl,nameName="id")
-  nodeA = makeNode(A)
-  nodeB = makeNode(B)
-  nodeout$AddChildNode(nodeA)
-  nodeout$AddChildNode(nodeB)
-  return(nodeout)
-}
-
-`%XOR%` = function(A,B) {
-  nl = list( id = makeID("XOR")
-           , fn ="XOR"
-           , arguments = {}
-           , operation = "combinator"
-           )
-  nodeout = FromListExplicit(nl,nameName="id")
-  nodeA = makeNode(A)
-  nodeB = makeNode(B)
-  nodeout$AddChildNode(nodeA)
-  nodeout$AddChildNode(nodeB)
-  return(nodeout)
 }
