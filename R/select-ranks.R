@@ -48,16 +48,6 @@ rankFromLeagueTable = function(small.values, leagueTable){
   return(res)
 }
 
-#' Ranks are equal
-#'
-#' Checks whether two list of treatments are the same
-#'
-#' @param ranklist the rank input
-#' @param rankProbabilityRow the rank from the \code{\link{precranking}} row output
-#'
-#' @return True / False
-}
-
 #' Treatment hierarchy from smaller to bigger from the league table
 #' 
 #' @param leagueTable is a table like the one exported by the 
