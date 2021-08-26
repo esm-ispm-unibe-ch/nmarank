@@ -56,7 +56,7 @@ prepareNMAEffects = function(TE, Cov) {
 #' The main function of the package\code{\link{nmarank}} gives the probabilities 
 #' of treatment hierarchies of network meta-analysis.
 #'
-#' @import netmeta mvtnorm tiryverse 
+#' @import netmeta mvtnorm tidyverse 
 #'
 #' @param x either an object of class \code{\link{netmeta}} or a list with the 
 #' effects and the variance-covariance list(TE=TE, Cov=Cov)
@@ -180,7 +180,7 @@ nmarank = function( x
 #'
 #' @param node of a predicate tree containing the name of a function
 #' @param small.values "good" or "bad" defines rank order
-#' @leagueTable the \code{TE} of a \code{nmaEffects} object produced by the 
+#' @param leagueTable the \code{TE} of a \code{nmaEffects} object produced by the 
 #' \code{prepareNMAEffects} function
 #'
 #' @return True/False
@@ -311,7 +311,7 @@ makeNode = function(selectionList) {
 #' It simply reverses predicate 
 #' 
 #' @param A selection list
-#' @example 
+#' @examples
 #' A = list(fn = "retainOrder", args = c("Placebo", "Salmeterol", "SFC"))
 #' opposite(A)
 #'  @export 
