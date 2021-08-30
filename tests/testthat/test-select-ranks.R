@@ -9,7 +9,7 @@ net1
 
 A = list(fn = "retainOrder", args = c("Placebo", "Salmeterol", "SFC"))
 B = list(fn = "treatementInSpecificPosition", args = list("Placebo", 1))
-C = list(fn = "isthesamerank", args = c("Placebo", "Fluticasone", "Salmeterol", "SFC"))
+C = list(fn = "isthesamehierarchy", args = c("Placebo", "Fluticasone", "Salmeterol", "SFC"))
 D = list(fn = "betterEqual", args = list("Fluticasone", 2))
 G = list(fn = "betterEqual", args = list("Placebo", 2))
 

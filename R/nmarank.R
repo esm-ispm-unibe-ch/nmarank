@@ -166,7 +166,7 @@ nmarank = function( x
                  )
   res <- list(x=x
             ,probabilityOfSelection = hitsranks$hits / nsim
-            ,ranks = ranks
+            ,hierarchies = ranks
   )
   return(res)
 }

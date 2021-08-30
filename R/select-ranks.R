@@ -64,15 +64,15 @@ rankFromLeagueTable = function(small.values, leagueTable){
   return(res)
 }
 
-#' Ranks are equal
+#' Hierarchies are equal
 #'
 #' Checks whether two list of treatments are the same
 #'
-#' @param ranklist the rank input
-#' @param rankProbabilityRow the rank from the \code{\link{precranking}} row output
+#' @param ranklist the hierarchy input
+#' @param rankProbabilityRow the hierarchy from the \code{\link{nmarank}} row output
 #'
 #' @return True / False
-isthesamerank = function(ranklist, small.values, leagueTable){
+isthesamehierarchy = function(ranklist, small.values, leagueTable){
  rank <- rankFromLeagueTable(small.values, leagueTable)
  out = all(rank==ranklist)
  return(out)
@@ -83,7 +83,7 @@ isthesamerank = function(ranklist, small.values, leagueTable){
 #' Checks whether a treatment is in specified position
 #'
 #' @param treatpos a  list with the treatment and posistion
-#' @param rankProbabilityRow the rank from the \code{\link{precranking}} row output
+#' @param rankProbabilityRow the rank from the \code{\link{nmarank}} row output
 #'
 #' @return True / False
 #'
@@ -102,7 +102,7 @@ treatementInSpecificPosition = function(treatpos, small.values, leagueTable){
 #' Other treatments may be between them.
 #'
 #' @param treatments a vector of treatments
-#' @param rankProbabilityRow the rank from the \code{\link{precranking}} row output
+#' @param rankProbabilityRow the rank from the \code{\link{nmarank}} row output
 #'
 #' @return True / False
 #'
