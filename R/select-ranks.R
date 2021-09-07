@@ -69,7 +69,8 @@ rankFromLeagueTable = function(small.values, leagueTable){
 #' Checks whether two list of treatments are the same
 #'
 #' @param ranklist the hierarchy input
-#' @param rankProbabilityRow the hierarchy from the \code{\link{nmarank}} row output
+#' @param rankProbabilityRow the hierarchy from the \code{\link{nmarank}} row 
+#' output
 #'
 #' @return True / False
 isthesamehierarchy = function(ranklist, small.values, leagueTable){
