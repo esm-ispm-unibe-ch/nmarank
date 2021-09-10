@@ -21,14 +21,13 @@
 #' argument.
 #' @export 
 prepareNMAEffects = function(TE, Cov) {
-  if(!all(rownames(Cov)==colnames(Cov))){
-    warning(paste("Variance-Covariance matrix Cov should be symmetric",
+  if((!all(rownames(Cov)==colnames(Cov))) 
+     | !isSymmetric.matrix(as.matrix(Cov),tol=10^(-6))){
+    stop(paste("Variance-Covariance matrix Cov should be symmetric",
                   "\n  ",
-                  "Please check row and column names are the same",
+                  "Please also check row and column names are the same",
                   "\n  ",
-                  sep = ""),
-            call. = FALSE)
-    return(invisible(NULL))
+                  sep = ""))
   }
   comps <- rownames(Cov)
   REs <- TE %>%
@@ -37,18 +36,17 @@ prepareNMAEffects = function(TE, Cov) {
       pivot_longer(cols = -rowname) %>%
       unite(name, rowname, name, sep = ":") %>%
       filter(name %in% comps)
-  if(!all((REs$name) == rownames(Cov))){
-    warning(paste("Relative Effects and Cov matrix do not match",
+  if((!all((REs$name) == rownames(Cov))) | is_empty(REs$value)){
+    stop(paste("Relative Effects and Cov matrix do not match",
                   "\n  ",
                   "Please check treatment labels and dimensions",
                   "\n  ",
-                  sep = ""),
-            call. = FALSE)
-    return(invisible(NULL))
+                  sep = ""))
+  }else{
+    res <- list(TE=TE, RE=REs$value, Cov = Cov)
+    class(res) <- "nmaEffects"
+    return(res)
   }
-  res <- list(TE=TE, RE=REs$value, Cov = Cov)
-  class(res) <- "nmaEffects"
-  return(res)
 }
 
 #' Precision of treatment ranking

@@ -21,6 +21,6 @@ test_that("bigger civ gives smaller probability", {
 test_that("civ of 0 gives the same probability as A > B", {
   C = list(fn = "retainOrder", args = list("SFC", "Fluticasone"))
   D = list(fn = "isbiggerCIV", args = list("SFC", "Fluticasone", 0))
-  p1 = nmarank(x=net1,predicate=(C %XOR% D))$probabilityOfSelection
+  p1 = nmarank(x=net1,small.values="good", predicate=(C %XOR% D))$probabilityOfSelection
   expect_equal(p1, 0)
 })
