@@ -35,11 +35,9 @@ nmaEffects <- function(TE, Cov) {
   if (!all(rownames(Cov) == colnames(Cov))) {
     warning(paste("Variance-Covariance matrix Cov should be symmetric",
                   "\n  ",
-                  "Please check row and column names are the same",
+                  "Please also check row and column names are the same",
                   "\n  ",
-                  sep = ""),
-            call. = FALSE)
-    return(invisible(NULL))
+                  sep = ""))
   }
   ##
   comps <- rownames(Cov)
@@ -51,14 +49,12 @@ nmaEffects <- function(TE, Cov) {
     unite("name", "rowname", "name", sep = ":") %>%
     filter(name %in% comps)
   ##
-  if (!all((REs$name) == rownames(Cov))) {
-    warning(paste("Relative Effects and Cov matrix do not match",
+  if ((!all((REs$name) == rownames(Cov))) | is_empty(REs$value)) {
+    stop(paste("Relative Effects and Cov matrix do not match",
                   "\n  ",
                   "Please check treatment labels and dimensions",
                   "\n  ",
-                  sep = ""),
-            call. = FALSE)
-    return(invisible(NULL))
+                  sep = ""))
   }
   ##
   res <- list(TE = TE, RE = REs$value, Cov = Cov)
