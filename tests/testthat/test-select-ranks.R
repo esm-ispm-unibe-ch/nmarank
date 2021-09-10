@@ -20,16 +20,24 @@ test_that("Build selection tree", {
                )
 })
 
+test_that("small.values='good' should give Placebo last for this mortality outcome", {
+  st1 <- list(fn = "treatementInSpecificPosition", args = list("Placebo", 1))
+  placeboFirst = nmarank(x=net1, predicate=st1, small.values="good")$probabilityOfSelection
+  st2 <- list(fn = "treatementInSpecificPosition", args = list("Placebo", 4))
+  placeboLast = nmarank(x=net1, predicate=st2, small.values="good")$probabilityOfSelection
+  expect_true(placeboLast>placeboFirst)
+})
+
 test_that("check Selection tree", {
   st = (A %OR% (B %XOR% (C %OR% (D %AND% G))))
   st1 = (B %XOR% (C %OR% (D %AND% G))) %OR% A
   effs <- prepareNMAEffects(net1$TE.random
                           ,net1$Cov.random)
   ranksrow = effs$TE
-  holds = selectionHolds(st, small.values="good", ranksrow)
+  holds = selectionHolds(st, small.values="bad", ranksrow)
   expect_true(holds)
-  expect_equal(selectionHolds(st, small.values="good", ranksrow),
-               selectionHolds(st1, small.values="good", ranksrow))
+  expect_equal(selectionHolds(st, small.values="bad", ranksrow),
+               selectionHolds(st1, small.values="bad", ranksrow))
 })
 
 test_that("Commutative selections", {

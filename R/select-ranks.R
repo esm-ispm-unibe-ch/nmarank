@@ -40,23 +40,7 @@ isbiggerCIV = function(args, small.values, leagueTable){
 #' 
 #' @export
 rankFromLeagueTable = function(small.values, leagueTable){
-  if(small.values == "bad"){
-    res <- sort(leagueTable[1,], decreasing = T) %>% names() 
-  }else{
-    res <- sort(leagueTable[1,]) %>% names() 
-  }
-  return(res)
-}
-
-#' Treatment hierarchy from smaller to bigger from the league table
-#' 
-#' @param leagueTable is a table like the one exported by the 
-#' \code{prepareNMAEffects} {$TE} object
-#' @return a vector of treatment names
-#' 
-#' @export
-rankFromLeagueTable = function(small.values, leagueTable){
-  if(small.values == "bad"){
+  if(small.values == "good"){
     res <- sort(leagueTable[1,], decreasing = T) %>% names() 
   }else{
     res <- sort(leagueTable[1,]) %>% names() 
@@ -69,7 +53,8 @@ rankFromLeagueTable = function(small.values, leagueTable){
 #' Checks whether two list of treatments are the same
 #'
 #' @param ranklist the hierarchy input
-#' @param rankProbabilityRow the hierarchy from the \code{\link{nmarank}} row output
+#' @param rankProbabilityRow the hierarchy from the \code{\link{nmarank}} row 
+#' output
 #'
 #' @return True / False
 isthesamehierarchy = function(ranklist, small.values, leagueTable){
