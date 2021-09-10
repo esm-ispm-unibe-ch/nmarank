@@ -1,27 +1,38 @@
-#' Checks wether the effects matrix \code{TE} and the variance-covariance matrix
-#' have consistent names it 
-#' @param TE a matrix with the NMA relative effects. Row and column names should
-#' be present and correspond to the respective treatment label. See example
-#' @param Cov variance-covariance matrix of the relative treatment effects
-#' row and column names should refer to the respective comparison. Comparisons 
-#' should be formatted as \code{treat1:treat2}
+#' Checks whether the effects matrix \code{TE} and the
+#' variance-covariance matrix have consistent names it
+#' 
+#' @param TE A matrix with the network estimates. Row and column names
+#'   should be present and correspond to the respective treatment
+#'   label. See example
+#' @param Cov variance-covariance matrix of the relative treatment
+#'   effects row and column names should refer to the respective
+#'   comparison. Comparisons should be formatted as
+#'   \code{treat1:treat2}
+#' 
+#' @return
+#' An object of class \code{nmaEffects} with \code{TE} a tibble with
+#' the relative effects and \code{Cov} the variance-covariance matrix
+#' provided as argument.
+#'
+#' @examples
 #' 
 #' data("Woods2010")
-#' see for example
 #' p1 <- pairwise(treatment, event = r, n = N,
-#'               studlab = author, data = Woods2010, sm = "OR")
-#' Conduct network meta-analysis
+#'                studlab = author, data = Woods2010, sm = "OR")
+#' # Conduct network meta-analysis
 #' net1 <- netmeta(p1)
 #' TE <- net1$TE.random
 #' Cov <- net1$Cov.random
-#' prepareNMAInputs(TE, Cov)
+#' nmaEffects(TE, Cov)
+#'
+#' @importFrom tidyr pivot_longer unite
+#' @importFrom stats runif
 #' 
-#' @return an object of class \code{nmaEffects} with \code{TE} a tibble with the 
-#' relative effects and \code{Cov} the variance-covariance matrix provided as 
-#' argument.
 #' @export 
-prepareNMAEffects = function(TE, Cov) {
-  if(!all(rownames(Cov)==colnames(Cov))){
+
+nmaEffects <- function(TE, Cov) {
+  
+  if (!all(rownames(Cov) == colnames(Cov))) {
     warning(paste("Variance-Covariance matrix Cov should be symmetric",
                   "\n  ",
                   "Please check row and column names are the same",
@@ -30,14 +41,17 @@ prepareNMAEffects = function(TE, Cov) {
             call. = FALSE)
     return(invisible(NULL))
   }
+  ##
   comps <- rownames(Cov)
+  ##
   REs <- TE %>%
-      as.data.frame() %>%
-      rownames_to_column() %>%
-      pivot_longer(cols = -rowname) %>%
-      unite(name, rowname, name, sep = ":") %>%
-      filter(name %in% comps)
-  if(!all((REs$name) == rownames(Cov))){
+    as.data.frame() %>%
+    rownames_to_column() %>%
+    pivot_longer(cols = -"rowname") %>%
+    unite("name", "rowname", "name", sep = ":") %>%
+    filter(name %in% comps)
+  ##
+  if (!all((REs$name) == rownames(Cov))) {
     warning(paste("Relative Effects and Cov matrix do not match",
                   "\n  ",
                   "Please check treatment labels and dimensions",
@@ -46,283 +60,227 @@ prepareNMAEffects = function(TE, Cov) {
             call. = FALSE)
     return(invisible(NULL))
   }
-  res <- list(TE=TE, RE=REs$value, Cov = Cov)
+  ##
+  res <- list(TE = TE, RE = REs$value, Cov = Cov)
   class(res) <- "nmaEffects"
-  return(res)
+  
+  res
 }
 
-#' Precision of treatment ranking
+
+#' Hierarchy of treatment rankings
 #'
-#' The main function of the package\code{\link{nmarank}} gives the probabilities 
-#' of treatment hierarchies of network meta-analysis.
+#' @details
+#' This function gives the probabilities of treatment hierarchies of
+#' network meta-analysis.
 #'
-#' @import netmeta mvtnorm tidyverse 
-#'
-#' @param x either an object of class \code{\link{netmeta}} or a list with the 
-#' effects and the variance-covariance list(TE=TE, Cov=Cov)
-#' @param nsim number of simulations
-#' @param small.values A character string specifying whether small treatment 
-#' effects indicate a "good" or "bad" effect
-#' @param predicate defines the condition that a possible relative effects 
-#' vector should comply to. See \code{select-ranks}
+#' @param TE.nma Either a \code{\link{netmeta}} object or a matrix
+#'   with network estimates.
+#' @param condition Defines the condition that a possible relative
+#'   effects vector should comply to. See \code{select-ranks}.
+#' @param text.condition Descriptive text for the condition.
+#' @param VCOV.nma Variance-covariance matrix for network estimates
+#'   (only considered if argument \code{TE.nma} isn't a
+#'   \code{\link{netmeta}} object).
+#' @param pooled A character string indicating whether the hierarchy
+#'   is calculated for the fixed effects (\code{"fixed"}) or random
+#'   effects model (\code{"random"}). Can be abbreviated.
+#' @param nsim Number of simulations.
+#' @param small.values A character string specifying whether small
+#'   treatment effects indicate a "good" or "bad" effect.
+#' @param x A \code{\link{nmarank}} object.
+#' @param \dots Additional arguments.
 #' 
-#' @return The main result is the \code{Output} is the list of rankings as lists 
-#' of treatments and their probabilities
+#' @return
 #'
-nmarank = function( x
-                  , nsim=10000
-                  , small.values="bad"
-                  , predicate = list(fn = "alwaysTrue", args = list())
-                  )
-{
-  if (!meta:::is.installed.package("mvtnorm", stop = FALSE)) {
-    warning(paste("Package 'mvtnorm' missing.",
-                  "\n  ",
-                  "Please use the following R command for installation:",
-                  "\n  ",
-                  "install.packages(\"mvtnorm\")",
-                  sep = ""),
-            call. = FALSE)
-    return(invisible(NULL))
+#' An object of class \code{"nmarank"} with corresponding
+#' \code{print} function. The object is a list containing the
+#' following components:
+#'
+#' \item{hierarchy}{...} 
+#' \item{TE.nma, condition, VCOV.nma,}{As defined above.}
+#' \item{pooled, nsim, small.values}{As defined above.}
+#'
+#' @import netmeta mvtnorm dplyr tibble data.tree
+#' 
+#' @examples
+#' data("Woods2010", package = "netmeta")
+#' p1 <- pairwise(treatment, event = r, n = N, studlab = author,
+#'                data = Woods2010, sm = "OR")
+#' net1 <- netmeta(p1, small.values = "bad")
+#'
+#' nmarank(net1, condition("always"), nsim = 100)
+#'
+#' criterionA <-
+#'  condition("sameHierarchy",
+#'            c("SFC", "Salmeterol", "Fluticasone", "Placebo"))
+#' nmarank(net1, criterionA, nsim = 100)
+#' 
+#' @export
+
+
+nmarank <- function(TE.nma, condition, text.condition = "",
+                    VCOV.nma = NULL, pooled,
+                    nsim = 10000, small.values) {
+  
+  
+  if (inherits(TE.nma, "netmeta")) {
+    if (!is.null(VCOV.nma))
+      warning("Argument 'VCOV.nma' ignored for objects of type 'netmeta'.",
+              call. = FALSE)
+    ##
+    if (missing(small.values))
+      small.values <- TE.nma$small.values
+    ##
+    if (missing(pooled))
+      if ((TE.nma$comb.fixed == FALSE) |
+          (TE.nma$comb.fixed == TRUE & TE.nma$comb.random == TRUE)) {
+        pooled <- "random"
+        VCOV.nma <- TE.nma$Cov.random
+        TE.nma <- TE.nma$TE.random
+      }
+      else {
+        pooled <- "fixed"
+        VCOV.nma <- TE.nma$Cov.fixed
+        TE.nma <- TE.nma$TE.fixed
+      }
   }
-  
-  if (!meta:::is.installed.package("tidyverse", stop = FALSE)) {
-    warning(paste("Package 'tidyverse' missing.",
-                  "\n  ",
-                  "Please use the following R command for installation:",
-                  "\n  ",
-                  "install.packages(\"tidyverse\")",
-                  sep = ""),
-            call. = FALSE)
-    return(invisible(NULL))
+  else {
+    if (is.null(VCOV.nma))
+      warning("Argument 'VCOV.nma' must be provided as ",
+              "'TE.nma' isn't a 'netmeta' object.",
+              call. = FALSE)
+    ##
+    if (missing(small.values))
+      small.values <- "bad"
+    ##
+    if (missing(pooled))
+      pooled <- ""
   }
+  ##
+  effects <- nmaEffects(TE.nma, VCOV.nma)
+  ##
+  TEs <- effects$TE
+  REs <- effects$RE
+  Covs <- effects$Cov
+  ##
+  small.values <- setchar(small.values, c("bad", "good"))
+  pooled <- setchar(pooled, c("fixed", "random", ""))
   
-  meta:::chkclass(x, c("netmeta", "nmaEffects"))
   
-  if(inherits(x,"netmeta")){
-    if((x$comb.fixed==F) | (x$comb.fixed==T & x$comb.random==T)){
-      nmaTE <- x$TE.random
-      nmaCovs <- x$Cov.random
-    }else{
-      nmaTE <- x$TE.fixed
-      nmaCovs <- x$Cov.fixed
-    }
-    effects <- prepareNMAEffects(nmaTE, nmaCovs)
-    TEs <- effects$TE
-    REs <- effects$RE
-    Covs <- effects$Cov
-  }else{
-    TEs <- x$TE
-    REs <- x$RE
-    Covs <- x$Cov
-  }
-  
-  leagueTableFromRelatives <- function(rels){
-    lgtbl = matrix(0
-                  ,nrow=nrow(TEs)
-                  ,ncol=ncol(TEs)
-                  ,dimnames = list( rownames(TEs)
-                                  , colnames(TEs))
-    )
+  leagueTableFromRelatives <- function(rels) {
+    lgtbl <- matrix(0, nrow = nrow(TEs), ncol = ncol(TEs),
+                    dimnames = list(rownames(TEs), colnames(TEs)))
+    ##
     lgtbl[lower.tri(lgtbl)] <- rels
     lgtbl <- t(lgtbl)
     lgtbl[lower.tri(lgtbl)] <- -rels
     lgtbl
   }
   
-  if(is.null(predicate$root)){
-    predicate = makeNode(predicate)
-  }
   
-  rels <- mvtnorm:::rmvnorm(nsim, REs, Covs,checkSymmetry=F)
+  if (is.null(condition$root))
+    condition <- makeNode(condition)
   
-  hitsranks <- Reduce(function(acc, i){
-    x <- rels[i,]
-    leagueT <- leagueTableFromRelatives(x)
-    if(selectionHolds(predicate, small.values, leagueT)){
-      newhits <- acc$hits + 1
-    }else{
-      newhits = acc$hits
-    }
-    thisrank <- rankFromLeagueTable(small.values,leagueT) %>% 
-      paste(collapse=", ")
-    newranks = acc$ranks
-    if(is.null(acc$ranks[thisrank])){ #for the first time
-      newranks[thisrank] <- 1
-    }else{
-      if(is.na.data.frame(acc$ranks[thisrank])){
+  
+  rels <- mvtnorm::rmvnorm(nsim, REs, Covs, checkSymmetry = FALSE)
+  
+  
+  hitsranks <-
+    Reduce(function(acc, i) {
+      x <- rels[i, ]
+      leagueT <- leagueTableFromRelatives(x)
+      if (selectionHolds(condition, small.values, leagueT))
+        newhits <- acc$hits + 1
+      else
+        newhits <- acc$hits
+      ##
+      thisrank <- getRank(leagueT, small.values) %>% paste(collapse = ", ")
+      newranks <- acc$ranks
+      if (is.null(acc$ranks[thisrank]))
         newranks[thisrank] <- 1
-      }else{
-        newranks[thisrank] <- newranks[thisrank] + 1
+      else {
+        if (is.na.data.frame(acc$ranks[thisrank]))
+          newranks[thisrank] <- 1
+        else
+          newranks[thisrank] <- newranks[thisrank] + 1
       }
-    }
-    newacc <- list(hits=newhits, ranks=newranks)
-    return(newacc)
-  },1:nsim,list(hits=0, ranks=c()))
+      ##
+      list(hits = newhits, ranks = newranks)
+    },
+    1:nsim, list(hits = 0, ranks = c()))
+  ##
+  hitsranks$ranks <- sort(hitsranks$ranks, decreasing = TRUE)
+  ##
+  ranks <- data.frame(Hierarchy = hitsranks$ranks %>% names(),
+                      Probability = hitsranks$ranks / nsim,
+                      row.names = seq_along(hitsranks$ranks))
   
-  hitsranks$ranks <- sort(hitsranks$ranks, decreasing = T)
-  ranks <- tibble( Hierarchies = hitsranks$ranks %>% names()
-                 , Probability = hitsranks$ranks / nsim
-                 )
-  res <- list(x=x
-            ,probabilityOfSelection = hitsranks$hits / nsim
-            ,hierarchies = ranks
-  )
-  return(res)
+  
+  res <- list(hierarchies = ranks,
+              probabilityOfSelection = hitsranks$hits / nsim,
+              TE.nma = TE.nma, VCOV.nma = VCOV.nma,
+              pooled = pooled, nsim = nsim, small.values = small.values,
+              condition = condition, text.condition = text.condition)
+  ##
+  class(res) <- "nmarank"
+  
+  res
 }
 
-#' Checks if a selection on relative treatment effects is true
-#'
-#' Calculates the value of a predicate statement predicate tree given 
-#' a league table
-#'
-#' @import data.tree
-#'
-#' @param node of a predicate tree containing the name of a function
-#' @param small.values "good" or "bad" defines rank order
-#' @param leagueTable the \code{TE} of a \code{nmaEffects} object produced by the 
-#' \code{prepareNMAEffects} function
-#'
-#' @return True/False
-#'
-selectionHolds = function(node, small.values, leagueTable){
-  if (!meta:::is.installed.package("data.tree", stop = FALSE)) {
-    warning(paste("Package 'data.tree' missing.",
-                  "\n  ",
-                  "Please use the following R command for installation:",
-                  "\n  ",
-                  "install.packages(\"data.tree\")",
-                  sep = ""),
-            call. = FALSE)
-    return(invisible(NULL))
+
+#' @rdname nmarank
+#' @method print nmarank
+#' @export
+#' @export print.nmarank
+
+print.nmarank <- function(x, text.condition = x$text.condition,
+                          nrows = 10,
+                          digits = 4, ...) {
+  if (x$pooled == "random")
+    text.pooled <- " (random effects model)"
+  else if (x$pooled == "fixed")
+    text.pooled <- " (fixed effects model)"
+  else
+    text.pooled <- ""
+  ##
+  cat(paste0("Treatment hierarchy", text.pooled, "\n\n"))
+
+  if (x$condition$fn == "alwaysTRUE") {
+    x$hierarchies$Probability %>% round(digits = digits)
+    print(x$hierarchies[seq_len(min(nrow(x$hierarchies), nrows)), ], ...)
+    if (nrows < nrow(x$hierarchies))
+      cat("...\n")
   }
-   if(node$operation == "function"){
-     return(get(node$fn)(node$args, small.values, leagueTable))
-   }else{
-     if(node$fn=="AND"){
-       return(
-         all(sapply(node$children, 
-                    function(x){
-                      return(selectionHolds(x,small.values,leagueTable))
-                    })
-         )
-       )
-     }else{
-       if(node$fn=="OR"){
-         return(
-           any(sapply(node$children, 
-                      function(x){
-                        return(selectionHolds(x,small.values, leagueTable))
-                      }
-                     )
-              )
-           )
-       }
-       if(node$fn=="XOR"){
-         return(
-           xor( selectionHolds(node$children[[1]], small.values,leagueTable)
-              , selectionHolds(node$children[[2]], small.values,leagueTable))
-           )
-       }
-       if(node$fn=="NOT"){
-         return(
-           ! ( selectionHolds(node$children[[1]], small.values,leagueTable))
-           )
-       }
-     }
-   }
-}
-
-#' Internall functions for constructing a predicate tree
-#' 
-#' 
-makeID = function(op) {
-  return(paste(op, as.character(floor(runif(1,0,1)*10000)), sep="_"))
-}
-
-makeNode = function(selectionList) {
-  if(is.null(selectionList$root)){
-  selectionList$id = makeID(as.character(selectionList$fn))
-  selectionList$operation = "function"
-  out = FromListExplicit(selectionList,nameName="id")
+  else if (x$condition$fn == "sameHierarchy") {
+    cat(paste0("Probability of hierarchy '",
+               paste(x$condition$args[[1]], collapse = ", "),
+               "': ",
+               x$probabilityOfSelection %>% round(digits = digits),
+               "\n"))
   }
-  else{
-    out = selectionList
-    }
-  return(out)
-}
-
-#' Combine selections with AND
-#'
-#' @param selections as list. Each selection comprises of a list with the
-#' function and its arguments
-#'
-#' @return data.tree
-#'
-#' @examples
-#' A = list(fn = "retainOrder", args = c("Placebo", "Salmeterol", "SFC"))
-#' B = list(fn = "retainOrder", args = c("Placebo", "Salmeterol", "SFC"))
-#' A %AND% B
-#'
-#' @export 
-`%AND%` = function(A,B) {
-  nl = list( id = makeID("AND")
-             , fn ="AND"
-             , arguments = {}
-             , operation = "combinator"
-             )
-  nodeout = FromListExplicit(nl,nameName="id")
-  nodeA = makeNode(A)
-  nodeB = makeNode(B)
-  nodeout$AddChildNode(nodeA)
-  nodeout$AddChildNode(nodeB)
-  return(nodeout)
-}
-
-`%OR%` = function(A,B) {
-  nl = list( id = makeID("OR")
-             , fn ="OR"
-             , arguments = {}
-             , operation = "combinator"
-             )
-  nodeout = FromListExplicit(nl,nameName="id")
-  nodeA = makeNode(A)
-  nodeB = makeNode(B)
-  nodeout$AddChildNode(nodeA)
-  nodeout$AddChildNode(nodeB)
-  return(nodeout)
-}
-
-`%XOR%` = function(A,B) {
-  nl = list( id = makeID("XOR")
-           , fn ="XOR"
-           , arguments = {}
-           , operation = "combinator"
-           )
-  nodeout = FromListExplicit(nl,nameName="id")
-  nodeA = makeNode(A)
-  nodeB = makeNode(B)
-  nodeout$AddChildNode(nodeA)
-  nodeout$AddChildNode(nodeB)
-  return(nodeout)
-}
-
-#' The NOT function for a selection statement
-#' It simply reverses predicate 
-#' 
-#' @param A selection list
-#' @examples
-#' A = list(fn = "retainOrder", args = c("Placebo", "Salmeterol", "SFC"))
-#' opposite(A)
-#'  @export 
-opposite = function(A) {
-  nl = list( id = makeID("NOT")
-           , fn ="NOT"
-           , arguments = {}
-           , operation = "reversor"
-           )
-  nodeout = FromListExplicit(nl,nameName="id")
-  nodeA = makeNode(A)
-  nodeout$AddChildNode(nodeA)
-  return(nodeout)
+  else if (x$condition$fn == "retainOrder") {
+    cat(paste0("Probability that order '",
+               paste(x$condition$args[[1]], collapse = ", "),
+               "' is retained anywhere in the hierarchy: ",
+               x$probabilityOfSelection %>% round(digits = digits),
+               "\n"))
+  }
+  else if (x$condition$fn == "betterEqual") {
+    cat(paste0("Probability that '",
+               x$condition$args[[1]],
+               "' is among the best ", x$condition$args[[2]],
+               " options: ",
+               x$probabilityOfSelection %>% round(digits = digits),
+               "\n"))
+  }
+  else {
+    cat(paste0("Probability", if (text.condition != "") " that ",
+               text.condition,
+               ": ",
+               x$probabilityOfSelection %>% round(digits = digits),
+               "\n"))
+  }
+  ##
+  invisible(NULL)
 }
