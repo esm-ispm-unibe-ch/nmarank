@@ -1,6 +1,6 @@
 getRank <- function(leagueTable, small.values) {
   res <- sort(leagueTable[1, ],
-              decreasing = small.values == "bad") %>% names() 
+              decreasing = small.values == "good") %>% names() 
   ##
   res
 }
@@ -32,8 +32,9 @@ specificPosition <- function(treatpos, small.values, leagueTable) {
 }
 
 
-retainOrder <- function(treatments, small.values, leagueTable)
-  !is.unsorted(match(treatments[[1]], getRank(leagueTable, small.values)))
+retainOrder <- function(treatments, small.values, leagueTable){
+  !is.unsorted(match(unlist(treatments), getRank(leagueTable, small.values)))
+}
 
 
 biggerCIV <- function(args, small.values, leagueTable)

@@ -21,10 +21,10 @@ test_that("Build selection tree", {
 })
 
 test_that("small.values='good' should give Placebo last for this mortality outcome", {
-  st1 <- list(fn = "treatementInSpecificPosition", args = list("Placebo", 1))
-  placeboFirst = nmarank(x=net1, predicate=st1, small.values="good")$probabilityOfSelection
-  st2 <- list(fn = "treatementInSpecificPosition", args = list("Placebo", 4))
-  placeboLast = nmarank(x=net1, predicate=st2, small.values="good")$probabilityOfSelection
+  st1 <- condition("specificPosition", "Placebo", 1)
+  placeboFirst = nmarank(net1, condition=st1,small.values="good")$probabilityOfSelection
+  st2 <- condition("specificPosition", "Placebo", 4)
+  placeboLast = nmarank(net1, condition=st2,small.values="good")$probabilityOfSelection
   expect_true(placeboLast>placeboFirst)
 })
 
@@ -42,11 +42,13 @@ test_that("check Selection tree", {
 test_that("Commutative selections", {
   st = (B %XOR% (C %OR% (D %AND% G))) %OR% A
   st1 = st %AND% G
-  p1 = nethierarchy(net1, st1)$probabilityOfSelection
+  p1 = nmarank(net1, st1)$probabilityOfSelection
   expect_type(p1, "double")
 })
 
 test_that("test opposite (not) function", {
-  p1 = nethierarchy(net1, B %AND% opposite(B))$probabilityOfSelection
+  st = B %AND% opposite(B)
+  p1 = nmarank(net1, st)$probabilityOfSelection
   expect_equal(p1, 0)
+  
 })

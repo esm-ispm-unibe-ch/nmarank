@@ -49,7 +49,7 @@ nmaEffects <- function(TE, Cov) {
     unite("name", "rowname", "name", sep = ":") %>%
     filter(name %in% comps)
   ##
-  if ((!all((REs$name) == rownames(Cov))) | is_empty(REs$value)) {
+  if ((!all((REs$name) == rownames(Cov))) | rlang::is_empty(REs$value)) {
     stop(paste("Relative Effects and Cov matrix do not match",
                   "\n  ",
                   "Please check treatment labels and dimensions",
