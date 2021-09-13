@@ -7,11 +7,11 @@ p1 <- pairwise(treatment, event = r, n = N,
 net1 <- netmeta(p1)
 net1
 
-A = list(fn = "retainOrder", args = c("Placebo", "Salmeterol", "SFC"))
-B = list(fn = "treatementInSpecificPosition", args = list("Placebo", 1))
-C = list(fn = "isthesamehierarchy", args = c("Placebo", "Fluticasone", "Salmeterol", "SFC"))
-D = list(fn = "betterEqual", args = list("Fluticasone", 2))
-G = list(fn = "betterEqual", args = list("Placebo", 2))
+A = condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
+B = condition("specificPosition", "Placebo", 1)
+C = condition("sameHierarchy", c("Placebo", "Fluticasone", "Salmeterol", "SFC"))
+D = condition("betterEqual", "Fluticasone", 2)
+G = condition("betterEqual", "Placebo", 2)
 
 test_that("Build selection tree", {
   st = (A %AND% (B %OR% (C %XOR% D)))
@@ -31,8 +31,7 @@ test_that("small.values='good' should give Placebo last for this mortality outco
 test_that("check Selection tree", {
   st = (A %OR% (B %XOR% (C %OR% (D %AND% G))))
   st1 = (B %XOR% (C %OR% (D %AND% G))) %OR% A
-  effs <- prepareNMAEffects(net1$TE.random
-                          ,net1$Cov.random)
+  effs <- nmaEffects(net1$TE.random, net1$Cov.random)
   ranksrow = effs$TE
   holds = selectionHolds(st, small.values="bad", ranksrow)
   expect_true(holds)
@@ -43,11 +42,11 @@ test_that("check Selection tree", {
 test_that("Commutative selections", {
   st = (B %XOR% (C %OR% (D %AND% G))) %OR% A
   st1 = st %AND% G
-  p1 = nmarank(x=net1, predicate=st1)$probabilityOfSelection
+  p1 = nethierarchy(net1, st1)$probabilityOfSelection
   expect_type(p1, "double")
 })
 
 test_that("test opposite (not) function", {
-  p1 = nmarank(x=net1,predicate=(B %AND% opposite(B)))$probabilityOfSelection
+  p1 = nethierarchy(net1, B %AND% opposite(B))$probabilityOfSelection
   expect_equal(p1, 0)
 })

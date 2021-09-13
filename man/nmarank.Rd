@@ -2,32 +2,74 @@
 % Please edit documentation in R/nmarank.R
 \name{nmarank}
 \alias{nmarank}
-\title{Precision of treatment ranking}
+\alias{print.nmarank}
+\title{Hierarchy of treatment rankings}
 \usage{
 nmarank(
-  x,
+  TE.nma,
+  condition,
+  text.condition = "",
+  VCOV.nma = NULL,
+  pooled,
   nsim = 10000,
-  small.values = "bad",
-  predicate = list(fn = "alwaysTrue", args = list())
+  small.values
 )
+
+\method{print}{nmarank}(x, text.condition = x$text.condition, nrows = 10, digits = 4, ...)
 }
 \arguments{
-\item{x}{either an object of class \code{\link{netmeta}} or a list with the 
-effects and the variance-covariance list(TE=TE, Cov=Cov)}
+\item{TE.nma}{Either a \code{\link{netmeta}} object or a matrix
+with network estimates.}
 
-\item{nsim}{number of simulations}
+\item{condition}{Defines the condition that a possible relative
+effects vector should comply to. See \code{select-ranks}.}
 
-\item{small.values}{A character string specifying whether small treatment 
-effects indicate a "good" or "bad" effect}
+\item{text.condition}{Descriptive text for the condition.}
 
-\item{predicate}{defines the condition that a possible relative effects 
-vector should comply to. See \code{select-ranks}}
+\item{VCOV.nma}{Variance-covariance matrix for network estimates
+(only considered if argument \code{TE.nma} isn't a
+\code{\link{netmeta}} object).}
+
+\item{pooled}{A character string indicating whether the hierarchy
+is calculated for the fixed effects (\code{"fixed"}) or random
+effects model (\code{"random"}). Can be abbreviated.}
+
+\item{nsim}{Number of simulations.}
+
+\item{small.values}{A character string specifying whether small
+treatment effects indicate a "good" or "bad" effect.}
+
+\item{x}{A \code{\link{nmarank}} object.}
+
+\item{\dots}{Additional arguments.}
 }
 \value{
-The main result is the \code{Output} is the list of rankings as lists 
-of treatments and their probabilities
+An object of class \code{"nmarank"} with corresponding
+\code{print} function. The object is a list containing the
+following components:
+
+\item{hierarchy}{...} 
+\item{TE.nma, condition, VCOV.nma,}{As defined above.}
+\item{pooled, nsim, small.values}{As defined above.}
 }
 \description{
-The main function of the package\code{\link{nmarank}} gives the probabilities 
-of treatment hierarchies of network meta-analysis.
+Hierarchy of treatment rankings
+}
+\details{
+This function gives the probabilities of treatment hierarchies of
+network meta-analysis.
+}
+\examples{
+data("Woods2010", package = "netmeta")
+p1 <- pairwise(treatment, event = r, n = N, studlab = author,
+               data = Woods2010, sm = "OR")
+net1 <- netmeta(p1, small.values = "bad")
+
+nmarank(net1, condition("always"), nsim = 100)
+
+criterionA <-
+ condition("sameHierarchy",
+           c("SFC", "Salmeterol", "Fluticasone", "Placebo"))
+nmarank(net1, criterionA, nsim = 100)
+
 }
