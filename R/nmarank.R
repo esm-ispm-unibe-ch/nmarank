@@ -27,6 +27,7 @@
 #'
 #' @importFrom tidyr pivot_longer unite
 #' @importFrom stats runif
+#' @importFrom rlang is_empty
 #' 
 #' @export 
 
@@ -49,7 +50,7 @@ nmaEffects <- function(TE, Cov) {
     unite("name", "rowname", "name", sep = ":") %>%
     filter(name %in% comps)
   ##
-  if ((!all((REs$name) == rownames(Cov))) | rlang::is_empty(REs$value)) {
+  if ((!all((REs$name) == rownames(Cov))) | is_empty(REs$value)) {
     stop(paste("Relative Effects and Cov matrix do not match",
                   "\n  ",
                   "Please check treatment labels and dimensions",
@@ -85,6 +86,9 @@ nmaEffects <- function(TE, Cov) {
 #' @param small.values A character string specifying whether small
 #'   treatment effects indicate a "good" or "bad" effect.
 #' @param x A \code{\link{nmarank}} object.
+#' @param nrows Number of hierarchies to print.
+#' @param digits Minimal number of significant digits for proportions,
+#'   see \code{print.default}.
 #' @param \dots Additional arguments.
 #' 
 #' @return
@@ -227,12 +231,15 @@ nmarank <- function(TE.nma, condition, text.condition = "",
 
 #' @rdname nmarank
 #' @method print nmarank
+#'
+#' @importFrom meta gs
+#' 
 #' @export
 #' @export print.nmarank
 
 print.nmarank <- function(x, text.condition = x$text.condition,
                           nrows = 10,
-                          digits = 4, ...) {
+                          digits = gs("digits.prop"), ...) {
   if (x$pooled == "random")
     text.pooled <- " (random effects model)"
   else if (x$pooled == "fixed")

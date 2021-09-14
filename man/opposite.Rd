@@ -5,17 +5,25 @@
 \title{The NOT function for a selection statement It simply reverses
 condition}
 \usage{
-opposite(A)
+opposite(cond)
 }
 \arguments{
-\item{A}{selection list}
+\item{cond}{\code{\link{condition}}.}
+}
+\value{
+Object of class 'data.tree'.
 }
 \description{
 The NOT function for a selection statement It simply reverses
 condition
 }
 \examples{
+data("Woods2010", package = "netmeta")
+p1 <- pairwise(treatment, event = r, n = N, studlab = author,
+               data = Woods2010, sm = "OR")
+net1 <- netmeta(p1, small.values = "bad")
+
 A = condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
-opposite(A)
+nmarank(net1, opposite(A), text.condition = "NOT order P-S-S")
 
 }

@@ -15,7 +15,13 @@ nmarank(
   small.values
 )
 
-\method{print}{nmarank}(x, text.condition = x$text.condition, nrows = 10, digits = 4, ...)
+\method{print}{nmarank}(
+  x,
+  text.condition = x$text.condition,
+  nrows = 10,
+  digits = gs("digits.prop"),
+  ...
+)
 }
 \arguments{
 \item{TE.nma}{Either a \code{\link{netmeta}} object or a matrix
@@ -40,6 +46,11 @@ effects model (\code{"random"}). Can be abbreviated.}
 treatment effects indicate a "good" or "bad" effect.}
 
 \item{x}{A \code{\link{nmarank}} object.}
+
+\item{nrows}{Number of hierarchies to print.}
+
+\item{digits}{Minimal number of significant digits for proportions,
+see \code{print.default}.}
 
 \item{\dots}{Additional arguments.}
 }

@@ -25,3 +25,15 @@ which can be abbreviated: "alwaysTRUE", "betterEqual",
 TODO: add more details on various functions (especially, function
 arguments)
 }
+\examples{
+data("Woods2010", package = "netmeta")
+p1 <- pairwise(treatment, event = r, n = N, studlab = author,
+               data = Woods2010, sm = "OR")
+net1 <- netmeta(p1, small.values = "bad")
+
+criterionA <-
+ condition("sameHierarchy",
+           c("SFC", "Salmeterol", "Fluticasone", "Placebo"))
+nmarank(net1, criterionA, nsim = 100)
+
+}

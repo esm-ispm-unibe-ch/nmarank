@@ -4,8 +4,28 @@
 \alias{\%XOR\%}
 \title{Combine selections with XOR}
 \usage{
-A \%XOR\% B
+cond1 \%XOR\% cond2
+}
+\arguments{
+\item{cond1}{First \code{\link{condition}}.}
+
+\item{cond2}{Second \code{\link{condition}}.}
+}
+\value{
+Object of class 'data.tree'.
 }
 \description{
 Combine selections with XOR
+}
+\examples{
+data("Woods2010", package = "netmeta")
+p1 <- pairwise(treatment, event = r, n = N, studlab = author,
+               data = Woods2010, sm = "OR")
+net1 <- netmeta(p1, small.values = "bad")
+
+A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
+B <- condition("retainOrder", c("Placebo", "SFC", "Salmeterol"))
+
+nmarank(net1, A \%XOR\% B)
+
 }
