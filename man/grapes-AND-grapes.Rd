@@ -4,21 +4,28 @@
 \alias{\%AND\%}
 \title{Combine selections with AND}
 \usage{
-A \%AND\% B
+cond1 \%AND\% cond2
 }
 \arguments{
-\item{selections}{as list. Each selection comprises of a list with the
-function and its arguments}
+\item{cond1}{First \code{\link{condition}}.}
+
+\item{cond2}{Second \code{\link{condition}}.}
 }
 \value{
-data.tree
+Object of class 'data.tree'.
 }
 \description{
 Combine selections with AND
 }
 \examples{
+data("Woods2010", package = "netmeta")
+p1 <- pairwise(treatment, event = r, n = N, studlab = author,
+               data = Woods2010, sm = "OR")
+net1 <- netmeta(p1, small.values = "bad")
+
 A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
 B <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
-A \%AND\% B
+
+nmarank(net1, A \%AND\% B)
 
 }

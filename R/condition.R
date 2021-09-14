@@ -13,6 +13,17 @@
 #' 
 #' @return A list.
 #'
+#' @examples
+#' data("Woods2010", package = "netmeta")
+#' p1 <- pairwise(treatment, event = r, n = N, studlab = author,
+#'                data = Woods2010, sm = "OR")
+#' net1 <- netmeta(p1, small.values = "bad")
+#'
+#' criterionA <-
+#'  condition("sameHierarchy",
+#'            c("SFC", "Salmeterol", "Fluticasone", "Placebo"))
+#' nmarank(net1, criterionA, nsim = 100)
+#'
 #' @export
 
 condition <- function(fn, ...) {
@@ -28,69 +39,107 @@ condition <- function(fn, ...) {
 
 #' Combine selections with AND
 #'
-#' @param selections as list. Each selection comprises of a list with the
-#' function and its arguments
+#' @param cond1 First \code{\link{condition}}.
+#' @param cond2 Second \code{\link{condition}}.
 #'
-#' @return data.tree
+#' @return Object of class 'data.tree'.
 #'
 #' @examples
+#' data("Woods2010", package = "netmeta")
+#' p1 <- pairwise(treatment, event = r, n = N, studlab = author,
+#'                data = Woods2010, sm = "OR")
+#' net1 <- netmeta(p1, small.values = "bad")
+#'
 #' A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
 #' B <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
-#' A %AND% B
+#'
+#' nmarank(net1, A %AND% B)
 #'
 #' @export
 
-`%AND%` <- function(A, B) {
+`%AND%` <- function(cond1, cond2) {
   nl <- list(id = makeID("AND"),
              fn = "AND",
              arguments = {},
-             operation = "combinator"
-             )
-  nodeout <- FromListExplicit(nl,nameName="id")
-  nodeA <- makeNode(A)
-  nodeB <- makeNode(B)
-  nodeout$AddChildNode(nodeA)
-  nodeout$AddChildNode(nodeB)
+             operation = "combinator")
+  ##
+  nodeout <- FromListExplicit(nl, nameName = "id")
+  node1 <- makeNode(cond1)
+  node2 <- makeNode(cond2)
+  nodeout$AddChildNode(node1)
+  nodeout$AddChildNode(node2)
   ##
   nodeout
 }
 
 
 #' Combine selections with OR
+#'
+#' @param cond1 First \code{\link{condition}}.
+#' @param cond2 Second \code{\link{condition}}.
+#'
+#' @return Object of class 'data.tree'.
+#'
+#' @examples
+#' data("Woods2010", package = "netmeta")
+#' p1 <- pairwise(treatment, event = r, n = N, studlab = author,
+#'                data = Woods2010, sm = "OR")
+#' net1 <- netmeta(p1, small.values = "bad")
+#'
+#' A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
+#' B <- condition("retainOrder", c("Placebo", "SFC", "Salmeterol"))
+#'
+#' nmarank(net1, A %OR% B)
 #' 
 #' @export 
 
-`%OR%` <- function(A, B) {
+`%OR%` <- function(cond1, cond2) {
   nl <- list(id = makeID("OR"),
              fn ="OR",
              arguments = {},
              operation = "combinator")
   ##
   nodeout <- FromListExplicit(nl, nameName = "id")
-  nodeA <- makeNode(A)
-  nodeB <- makeNode(B)
-  nodeout$AddChildNode(nodeA)
-  nodeout$AddChildNode(nodeB)
+  node1 <- makeNode(cond1)
+  node2 <- makeNode(cond2)
+  nodeout$AddChildNode(node1)
+  nodeout$AddChildNode(node2)
   ##
   nodeout
 }
 
 
 #' Combine selections with XOR
+#'
+#' @param cond1 First \code{\link{condition}}.
+#' @param cond2 Second \code{\link{condition}}.
+#'
+#' @return Object of class 'data.tree'.
+#'
+#' @examples
+#' data("Woods2010", package = "netmeta")
+#' p1 <- pairwise(treatment, event = r, n = N, studlab = author,
+#'                data = Woods2010, sm = "OR")
+#' net1 <- netmeta(p1, small.values = "bad")
+#'
+#' A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
+#' B <- condition("retainOrder", c("Placebo", "SFC", "Salmeterol"))
+#'
+#' nmarank(net1, A %XOR% B)
 #' 
 #' @export 
 
-`%XOR%` <- function(A, B) {
+`%XOR%` <- function(cond1, cond2) {
   nl <- list(id = makeID("XOR"),
              fn ="XOR",
              arguments = {},
              operation = "combinator")
   ##
   nodeout <- FromListExplicit(nl, nameName = "id")
-  nodeA <- makeNode(A)
-  nodeB <- makeNode(B)
-  nodeout$AddChildNode(nodeA)
-  nodeout$AddChildNode(nodeB)
+  node1 <- makeNode(cond1)
+  node2 <- makeNode(cond2)
+  nodeout$AddChildNode(node1)
+  nodeout$AddChildNode(node2)
   ##
   nodeout
 }
@@ -99,23 +148,30 @@ condition <- function(fn, ...) {
 #' The NOT function for a selection statement It simply reverses
 #' condition
 #' 
-#' @param A selection list
-#' 
+#' @param cond \code{\link{condition}}.
+#'
+#' @return Object of class 'data.tree'.
+#'
 #' @examples
+#' data("Woods2010", package = "netmeta")
+#' p1 <- pairwise(treatment, event = r, n = N, studlab = author,
+#'                data = Woods2010, sm = "OR")
+#' net1 <- netmeta(p1, small.values = "bad")
+#' 
 #' A = condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
-#' opposite(A)
+#' nmarank(net1, opposite(A), text.condition = "NOT order P-S-S")
 #' 
 #' @export
 
-opposite <- function(A) {
+opposite <- function(cond) {
   nl <- list(id = makeID("NOT"),
-            fn ="NOT",
-            arguments = {},
-            operation = "reversor"
-            )
-  nodeout = FromListExplicit(nl,nameName="id")
-  nodeA = makeNode(A)
-  nodeout$AddChildNode(nodeA)
+             fn ="NOT",
+             arguments = {},
+             operation = "reversor")
+  ##
+  nodeout = FromListExplicit(nl, nameName="id")
+  node = makeNode(cond)
+  nodeout$AddChildNode(node)
   ##
   nodeout
 }

@@ -4,8 +4,28 @@
 \alias{\%OR\%}
 \title{Combine selections with OR}
 \usage{
-A \%OR\% B
+cond1 \%OR\% cond2
+}
+\arguments{
+\item{cond1}{First \code{\link{condition}}.}
+
+\item{cond2}{Second \code{\link{condition}}.}
+}
+\value{
+Object of class 'data.tree'.
 }
 \description{
 Combine selections with OR
+}
+\examples{
+data("Woods2010", package = "netmeta")
+p1 <- pairwise(treatment, event = r, n = N, studlab = author,
+               data = Woods2010, sm = "OR")
+net1 <- netmeta(p1, small.values = "bad")
+
+A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
+B <- condition("retainOrder", c("Placebo", "SFC", "Salmeterol"))
+
+nmarank(net1, A \%OR\% B)
+
 }
