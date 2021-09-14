@@ -3,7 +3,7 @@
 \name{nmarank}
 \alias{nmarank}
 \alias{print.nmarank}
-\title{Hierarchy of treatment rankings}
+\title{Probabilities of treatment hierarchies}
 \usage{
 nmarank(
   TE.nma,
@@ -27,10 +27,11 @@ nmarank(
 \item{TE.nma}{Either a \code{\link{netmeta}} object or a matrix
 with network estimates.}
 
-\item{condition}{Defines the condition that a possible relative
-effects vector should comply to. See \code{select-ranks}.}
+\item{condition}{Defines the conditions that should be satisfied
+by the treatments in the network. Multiple conditions can be combined with
+special operators into any decision tree. See \code{condition}.}
 
-\item{text.condition}{Descriptive text for the condition.}
+\item{text.condition}{Optional descriptive text for the condition.}
 
 \item{VCOV.nma}{Variance-covariance matrix for network estimates
 (only considered if argument \code{TE.nma} isn't a
@@ -59,16 +60,24 @@ An object of class \code{"nmarank"} with corresponding
 \code{print} function. The object is a list containing the
 following components:
 
-\item{hierarchy}{...} 
+\item{hierarchies}{A list of the most frequent hierarchies along with their
+estimated probability of occurrence} 
+\item{probabilityOfSelection}{combined probability of all hierarchies that
+satisfy the defined condition}
 \item{TE.nma, condition, VCOV.nma,}{As defined above.}
 \item{pooled, nsim, small.values}{As defined above.}
 }
 \description{
-Hierarchy of treatment rankings
+Specifies the frequencies of hierarchies along with their estimated
+probabilities and the probability that a specified criterion holds.
 }
 \details{
-This function gives the probabilities of treatment hierarchies of
-network meta-analysis.
+A simulation method is used to derive the relative frequency of all possible
+hierarchies in a network of interventions. Users can also define the set of all
+possible hierarchies that satisfy a specified criterion, for example that a
+specific order among treatments is retained in the network and/or a treatment
+is in a specific position, and the sum of their frequencies constitute the
+certainty around the criterion.
 }
 \examples{
 data("Woods2010", package = "netmeta")

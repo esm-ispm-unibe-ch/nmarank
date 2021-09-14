@@ -24,6 +24,6 @@ p1 <- pairwise(treatment, event = r, n = N, studlab = author,
 net1 <- netmeta(p1, small.values = "bad")
 
 A = condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
-nmarank(net1, opposite(A), text.condition = "NOT order P-S-S")
+nmarank(net1, opposite(A), text.condition = "NOT order P-S-S", nsim=5000)
 
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/condition.R
 \name{condition}
 \alias{condition}
-\title{Define condition}
+\title{Define which hierarchies to select}
 \usage{
 condition(fn, ...)
 }
@@ -12,18 +12,33 @@ condition(fn, ...)
 \item{\dots}{Function arguments.}
 }
 \value{
-A list.
+A list with the defined function and its arguments.
 }
 \description{
-Define condition
+Defines a condition that is of interest to be satisfied involving a set of
+treatments in the network.
 }
 \details{
-Argument \code{fn} can be any of the following character strings
-which can be abbreviated: "alwaysTRUE", "betterEqual",
-"sameHierarchy", "specificPosition", "retainOrder", "biggerCIV"
-
-TODO: add more details on various functions (especially, function
-arguments)
+Each implemented condition function needs a specific set of arguments. 
+Available conditions and their accompanying arguments are:
+\itemize{
+ \item{"sameHierarchy": }{Testing that a specified hierarchy occurs with arguments a vector of length equal to the number of treatments in the network }
+\item{"specificPosition": }{A treatment ranks in a specific position with
+arguments a list including the name of the treatment and its position}
+\item{"retainOrder": }{The order of two or more treatments is retained in the
+hierarchy with arguments a vector of length smaller or equal to the number of
+treatments in the network with the specified order to be retained}
+\item{"betterEqual": }{A treatment has a position better or equal to a
+specific rank with arguments a list including the name of the treatment and
+the set position} 
+\item{"biggerCIV": }{The effect of the first treatment is bigger than that of
+the second by more than a given clinically important value with arguments: a
+vector of length 3 with the first and second treatment and the clinically
+important value in an additive scale (e.g. log odds ratio, log risk ratio,
+mean difference). Note that the actual value of the relative effect is considered
+independently of whether \code{small.values} is \code{"good"} or \code{"bad"} }
+\item{"alwaysTRUE": }{All hierarchies are included. No arguments required}
+}
 }
 \examples{
 data("Woods2010", package = "netmeta")

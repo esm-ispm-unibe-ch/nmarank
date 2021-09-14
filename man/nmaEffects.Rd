@@ -2,20 +2,18 @@
 % Please edit documentation in R/nmarank.R
 \name{nmaEffects}
 \alias{nmaEffects}
-\title{Checks whether the effects matrix \code{TE} and the
-variance-covariance matrix have consistent names it}
+\title{Check input data for \code{nmarank}}
 \usage{
 nmaEffects(TE, Cov)
 }
 \arguments{
-\item{TE}{A matrix with the network estimates. Row and column names
-should be present and correspond to the respective treatment
-label. See example}
+\item{TE}{A matrix with the network meta-analysis relative treatment effects.
+Rows and columns should be labeled according to the treatment names as
+shown in the example.}
 
-\item{Cov}{variance-covariance matrix of the relative treatment
-effects row and column names should refer to the respective
-comparison. Comparisons should be formatted as
-\code{treat1:treat2}}
+\item{Cov}{Variance-covariance matrix of the network meta-analysis relative
+treatment effects. Row and column names should refer to the respective
+treatment comparisons as shown in the example.}
 }
 \value{
 An object of class \code{nmaEffects} with \code{TE} a tibble with
@@ -23,8 +21,8 @@ the relative effects and \code{Cov} the variance-covariance matrix
 provided as argument.
 }
 \description{
-Checks whether the effects matrix \code{TE} and the
-variance-covariance matrix have consistent names it
+Checks whether the network meta-analysis treatment effects TE and their
+variance-covariance matrix Cov have consistent names.
 }
 \examples{
 

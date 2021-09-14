@@ -1,17 +1,35 @@
-#' Define condition
+#' Define which hierarchies to select
+#' 
+#' @description
+#' Defines a condition that is of interest to be satisfied involving a set of
+#' treatments in the network. 
 #' 
 #' @param fn Character string specifiying type of condition.
 #' @param \dots Function arguments.
 #'
 #' @details
-#' Argument \code{fn} can be any of the following character strings
-#' which can be abbreviated: "alwaysTRUE", "betterEqual",
-#' "sameHierarchy", "specificPosition", "retainOrder", "biggerCIV"
-#'
-#' TODO: add more details on various functions (especially, function
-#' arguments)
+#' Each implemented condition function needs a specific set of arguments. 
+#' Available conditions and their accompanying arguments are:
+#' \itemize{
+#'  \item{"sameHierarchy": }{Testing that a specified hierarchy occurs with arguments a vector of length equal to the number of treatments in the network }
+#' \item{"specificPosition": }{A treatment ranks in a specific position with
+#' arguments a list including the name of the treatment and its position}
+#' \item{"retainOrder": }{The order of two or more treatments is retained in the
+#' hierarchy with arguments a vector of length smaller or equal to the number of
+#' treatments in the network with the specified order to be retained}
+#' \item{"betterEqual": }{A treatment has a position better or equal to a
+#' specific rank with arguments a list including the name of the treatment and
+#' the set position} 
+#' \item{"biggerCIV": }{The effect of the first treatment is bigger than that of
+#' the second by more than a given clinically important value with arguments: a
+#' vector of length 3 with the first and second treatment and the clinically
+#' important value in an additive scale (e.g. log odds ratio, log risk ratio,
+#' mean difference). Note that the actual value of the relative effect is considered
+#' independently of whether \code{small.values} is \code{"good"} or \code{"bad"} }
+#' \item{"alwaysTRUE": }{All hierarchies are included. No arguments required}
+#'}
 #' 
-#' @return A list.
+#' @return A list with the defined function and its arguments.
 #'
 #' @examples
 #' data("Woods2010", package = "netmeta")
@@ -51,9 +69,9 @@ condition <- function(fn, ...) {
 #' net1 <- netmeta(p1, small.values = "bad")
 #'
 #' A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
-#' B <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
+#' B <- condition("betterEqual", "Fluticasone", 2)
 #'
-#' nmarank(net1, A %AND% B)
+#' nmarank(net1, A %AND% B, nsim=5000)
 #'
 #' @export
 
@@ -87,9 +105,9 @@ condition <- function(fn, ...) {
 #' net1 <- netmeta(p1, small.values = "bad")
 #'
 #' A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
-#' B <- condition("retainOrder", c("Placebo", "SFC", "Salmeterol"))
+#' B <- condition("betterEqual", "Fluticasone", 2)
 #'
-#' nmarank(net1, A %OR% B)
+#' nmarank(net1, A %OR% B, nsim=5000)
 #' 
 #' @export 
 
@@ -123,9 +141,9 @@ condition <- function(fn, ...) {
 #' net1 <- netmeta(p1, small.values = "bad")
 #'
 #' A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
-#' B <- condition("retainOrder", c("Placebo", "SFC", "Salmeterol"))
+#' B <- condition("betterEqual", "Fluticasone", 2)
 #'
-#' nmarank(net1, A %XOR% B)
+#' nmarank(net1, A %XOR% B, nsim=3000)
 #' 
 #' @export 
 
@@ -159,7 +177,7 @@ condition <- function(fn, ...) {
 #' net1 <- netmeta(p1, small.values = "bad")
 #' 
 #' A = condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
-#' nmarank(net1, opposite(A), text.condition = "NOT order P-S-S")
+#' nmarank(net1, opposite(A), text.condition = "NOT order P-S-S", nsim=5000)
 #' 
 #' @export
 

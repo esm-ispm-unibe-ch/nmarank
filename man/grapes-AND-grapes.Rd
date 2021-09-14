@@ -24,8 +24,8 @@ p1 <- pairwise(treatment, event = r, n = N, studlab = author,
 net1 <- netmeta(p1, small.values = "bad")
 
 A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
-B <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
+B <- condition("betterEqual", "Fluticasone", 2)
 
-nmarank(net1, A \%AND\% B)
+nmarank(net1, A \%AND\% B, nsim=5000)
 
 }

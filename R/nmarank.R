@@ -1,13 +1,15 @@
-#' Checks whether the effects matrix \code{TE} and the
-#' variance-covariance matrix have consistent names it
+#' Check input data for \code{nmarank}
+#'
+#' @description
+#' Checks whether the network meta-analysis treatment effects TE and their
+#' variance-covariance matrix Cov have consistent names.
 #' 
-#' @param TE A matrix with the network estimates. Row and column names
-#'   should be present and correspond to the respective treatment
-#'   label. See example
-#' @param Cov variance-covariance matrix of the relative treatment
-#'   effects row and column names should refer to the respective
-#'   comparison. Comparisons should be formatted as
-#'   \code{treat1:treat2}
+#' @param TE A matrix with the network meta-analysis relative treatment effects.
+#'   Rows and columns should be labeled according to the treatment names as
+#'   shown in the example.
+#' @param Cov Variance-covariance matrix of the network meta-analysis relative
+#' treatment effects. Row and column names should refer to the respective
+#' treatment comparisons as shown in the example.
 #' 
 #' @return
 #' An object of class \code{nmaEffects} with \code{TE} a tibble with
@@ -27,7 +29,8 @@
 #'
 #' @importFrom tidyr pivot_longer unite
 #' @importFrom stats runif
-#' @importFrom rlang is_empty
+#' @importFrom rlang is_empty 
+#' @importFrom rlang .data
 #' 
 #' @export 
 
@@ -47,10 +50,10 @@ nmaEffects <- function(TE, Cov) {
     as.data.frame() %>%
     rownames_to_column() %>%
     pivot_longer(cols = -"rowname") %>%
-    unite("name", "rowname", "name", sep = ":") %>%
-    filter(name %in% comps)
+    unite("compname", "rowname", "name", sep = ":") %>%
+    filter(.data$compname %in% comps)
   ##
-  if ((!all((REs$name) == rownames(Cov))) | is_empty(REs$value)) {
+  if ((!all((REs$compname) == rownames(Cov))) | is_empty(REs$value)) {
     stop(paste("Relative Effects and Cov matrix do not match",
                   "\n  ",
                   "Please check treatment labels and dimensions",
@@ -65,17 +68,26 @@ nmaEffects <- function(TE, Cov) {
 }
 
 
-#' Hierarchy of treatment rankings
+#' Probabilities of treatment hierarchies
+#'
+#' @description
+#' Specifies the frequencies of hierarchies along with their estimated
+#' probabilities and the probability that a specified criterion holds.
 #'
 #' @details
-#' This function gives the probabilities of treatment hierarchies of
-#' network meta-analysis.
+#' A simulation method is used to derive the relative frequency of all possible
+#' hierarchies in a network of interventions. Users can also define the set of all
+#' possible hierarchies that satisfy a specified criterion, for example that a
+#' specific order among treatments is retained in the network and/or a treatment
+#' is in a specific position, and the sum of their frequencies constitute the
+#' certainty around the criterion. 
 #'
 #' @param TE.nma Either a \code{\link{netmeta}} object or a matrix
 #'   with network estimates.
-#' @param condition Defines the condition that a possible relative
-#'   effects vector should comply to. See \code{select-ranks}.
-#' @param text.condition Descriptive text for the condition.
+#' @param condition Defines the conditions that should be satisfied
+#' by the treatments in the network. Multiple conditions can be combined with
+#' special operators into any decision tree. See \code{condition}.
+#' @param text.condition Optional descriptive text for the condition.
 #' @param VCOV.nma Variance-covariance matrix for network estimates
 #'   (only considered if argument \code{TE.nma} isn't a
 #'   \code{\link{netmeta}} object).
@@ -97,7 +109,10 @@ nmaEffects <- function(TE, Cov) {
 #' \code{print} function. The object is a list containing the
 #' following components:
 #'
-#' \item{hierarchy}{...} 
+#' \item{hierarchies}{A list of the most frequent hierarchies along with their
+#' estimated probability of occurrence} 
+#' \item{probabilityOfSelection}{combined probability of all hierarchies that
+#' satisfy the defined condition}
 #' \item{TE.nma, condition, VCOV.nma,}{As defined above.}
 #' \item{pooled, nsim, small.values}{As defined above.}
 #'

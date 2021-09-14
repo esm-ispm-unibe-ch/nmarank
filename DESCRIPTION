@@ -1,7 +1,7 @@
 Package: nmarank
 Type: Package
-Title: Precision in treatment ranking
-Version: 0.2-1
+Title: Complex hierarchy questions in network meta-analysis
+Version: 0.2-2
 Date: 2021-09-14
 Authors@R: c(person("Adriani", "Nikolakopoulou",
                     role = "aut"),
@@ -17,11 +17,7 @@ Author: Adriani Nikolakopoulou [aut],
   Guido Schwarzer [aut],
   Theodoros Papakonstantinou [aut, cre]
 Maintainer: Theodoros Papakonstantinou <dev@tpapak.com>
-Description: Provides probability matrix of the most frequent treatment rankings
-  by sampling the multivariate normal of the NMA effect sizes. One can also
-  describe complex selection ranking criteria through a simple syntax and basic
-  functions introduced and calculate their probability. Netmeta
-  can be used for analysis or an existing league table can be provided.
+Description: Derives the most frequent hierarchies along with their probability of occurrence. One can also define complex hierarchy criteria and calculate their probability. Methodology based on Papakonstantinou et al. (2021) <DOI:10.21203/rs.3.rs-858140/v1>.
 License: GPL-3
 Depends: R (>= 3.3.1), netmeta (>= 1.5-0), data.tree, mvtnorm, tidyr
 Imports: dplyr, tibble, meta (>= 4.19-1), rlang
