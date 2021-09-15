@@ -22,7 +22,9 @@ treatments in the network.
 Each implemented condition function needs a specific set of arguments. 
 Available conditions and their accompanying arguments are:
 \itemize{
- \item{"sameHierarchy": }{Testing that a specified hierarchy occurs with arguments a vector of length equal to the number of treatments in the network }
+ \item{"sameHierarchy": }{Testing that a specified hierarchy occurs with
+ arguments a vector of length equal to the number of treatments in the
+ network }
 \item{"specificPosition": }{A treatment ranks in a specific position with
 arguments a list including the name of the treatment and its position}
 \item{"retainOrder": }{The order of two or more treatments is retained in the
@@ -37,8 +39,15 @@ vector of length 3 with the first and second treatment and the clinically
 important value in an additive scale (e.g. log odds ratio, log risk ratio,
 mean difference). Note that the actual value of the relative effect is considered
 independently of whether \code{small.values} is \code{"good"} or \code{"bad"} }
-\item{"alwaysTRUE": }{All hierarchies are included. No arguments required}
 }
+
+Condition composition:
+
+Conditions can be combined to express more complex decision trees. This
+can be done by using the special operators \%AND\% \%OR\% \%XOR\% and the
+\code{opposite} function. The combination should be defined as a binary
+tree with the use of parentheses. If A,B,C,D are conditions we can for
+example combine them into E as \code{E=A \%AND\% (B \%OR\% (opposite(C) \%XOR\% D))}
 }
 \examples{
 data("Woods2010", package = "netmeta")
@@ -46,9 +55,30 @@ p1 <- pairwise(treatment, event = r, n = N, studlab = author,
                data = Woods2010, sm = "OR")
 net1 <- netmeta(p1, small.values = "bad")
 
+#criterionA if all treatments are in the exact order defined
 criterionA <-
- condition("sameHierarchy",
-           c("SFC", "Salmeterol", "Fluticasone", "Placebo"))
-nmarank(net1, criterionA, nsim = 100)
+condition("sameHierarchy",
+        c("SFC", "Salmeterol", "Fluticasone", "Placebo"))
+
+#criterionB respects the relative order of two or more treatments
+criterionB <-
+  condition("retainOrder",
+             c("SFC", "Fluticasone", "Placebo"))
+
+# Below we define the condition that SFC and Salmeterol are in the first two
+#positions. We first define the conditions that each one of them is in
+#position 1 or 2
+criterionC1 <- condition("betterEqual", "SFC", 2)
+criterionC2 <- condition("betterEqual", "Salmeterol", 2)
+#We then combine them with \%AND\%
+criterionC <- criterionC1 \%AND\% criterionC2
+#Next we can feed the condition into nmarank to get the probability of the
+#selection
+nmarank(net1, criterionC,
+        text.condition =
+        "SFC and Salmeterol are the two best options", nsim=100)
+
+#We can further combine criteria
+criterionD <- criterionA \%AND\% (criterionB \%OR\% opposite(criterionC))
 
 }

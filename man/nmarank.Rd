@@ -7,7 +7,7 @@
 \usage{
 nmarank(
   TE.nma,
-  condition,
+  condition = NULL,
   text.condition = "",
   VCOV.nma = NULL,
   pooled,
@@ -29,7 +29,7 @@ with network estimates.}
 
 \item{condition}{Defines the conditions that should be satisfied
 by the treatments in the network. Multiple conditions can be combined with
-special operators into any decision tree. See \code{condition}.}
+special operators into any decision tree. See \code{\link{condition}}.}
 
 \item{text.condition}{Optional descriptive text for the condition.}
 

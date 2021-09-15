@@ -1,8 +1,8 @@
 Package: nmarank
 Type: Package
-Title: Complex hierarchy questions in network meta-analysis
-Version: 0.2-2
-Date: 2021-09-14
+Title: Complex Hierarchy Questions in Network Meta-Analysis
+Version: 0.2-3
+Date: 2021-09-15
 Authors@R: c(person("Adriani", "Nikolakopoulou",
                     role = "aut"),
              person("Guido", "Schwarzer",
@@ -13,10 +13,6 @@ Authors@R: c(person("Adriani", "Nikolakopoulou",
                     email = "dev@tpapak.com",
                     comment = c(ORCID = "0000-0002-6630-6817"))
             )
-Author: Adriani Nikolakopoulou [aut],
-  Guido Schwarzer [aut],
-  Theodoros Papakonstantinou [aut, cre]
-Maintainer: Theodoros Papakonstantinou <dev@tpapak.com>
 Description: Derives the most frequent hierarchies along with their probability of occurrence. One can also define complex hierarchy criteria and calculate their probability. Methodology based on Papakonstantinou et al. (2021) <DOI:10.21203/rs.3.rs-858140/v1>.
 License: GPL-3
 Depends: R (>= 3.3.1), netmeta (>= 1.5-0), data.tree, mvtnorm, tidyr

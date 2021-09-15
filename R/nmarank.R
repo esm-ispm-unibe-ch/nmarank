@@ -1,73 +1,3 @@
-#' Check input data for \code{nmarank}
-#'
-#' @description
-#' Checks whether the network meta-analysis treatment effects TE and their
-#' variance-covariance matrix Cov have consistent names.
-#' 
-#' @param TE A matrix with the network meta-analysis relative treatment effects.
-#'   Rows and columns should be labeled according to the treatment names as
-#'   shown in the example.
-#' @param Cov Variance-covariance matrix of the network meta-analysis relative
-#' treatment effects. Row and column names should refer to the respective
-#' treatment comparisons as shown in the example.
-#' 
-#' @return
-#' An object of class \code{nmaEffects} with \code{TE} a tibble with
-#' the relative effects and \code{Cov} the variance-covariance matrix
-#' provided as argument.
-#'
-#' @examples
-#' 
-#' data("Woods2010")
-#' p1 <- pairwise(treatment, event = r, n = N,
-#'                studlab = author, data = Woods2010, sm = "OR")
-#' # Conduct network meta-analysis
-#' net1 <- netmeta(p1)
-#' TE <- net1$TE.random
-#' Cov <- net1$Cov.random
-#' nmaEffects(TE, Cov)
-#'
-#' @importFrom tidyr pivot_longer unite
-#' @importFrom stats runif
-#' @importFrom rlang is_empty 
-#' @importFrom rlang .data
-#' 
-#' @export 
-
-nmaEffects <- function(TE, Cov) {
-  
-  if (!all(rownames(Cov) == colnames(Cov))) {
-    warning(paste("Variance-Covariance matrix Cov should be symmetric",
-                  "\n  ",
-                  "Please also check row and column names are the same",
-                  "\n  ",
-                  sep = ""))
-  }
-  ##
-  comps <- rownames(Cov)
-  ##
-  REs <- TE %>%
-    as.data.frame() %>%
-    rownames_to_column() %>%
-    pivot_longer(cols = -"rowname") %>%
-    unite("compname", "rowname", "name", sep = ":") %>%
-    filter(.data$compname %in% comps)
-  ##
-  if ((!all((REs$compname) == rownames(Cov))) | is_empty(REs$value)) {
-    stop(paste("Relative Effects and Cov matrix do not match",
-                  "\n  ",
-                  "Please check treatment labels and dimensions",
-                  "\n  ",
-                  sep = ""))
-  }
-  ##
-  res <- list(TE = TE, RE = REs$value, Cov = Cov)
-  class(res) <- "nmaEffects"
-  
-  res
-}
-
-
 #' Probabilities of treatment hierarchies
 #'
 #' @description
@@ -86,7 +16,7 @@ nmaEffects <- function(TE, Cov) {
 #'   with network estimates.
 #' @param condition Defines the conditions that should be satisfied
 #' by the treatments in the network. Multiple conditions can be combined with
-#' special operators into any decision tree. See \code{condition}.
+#' special operators into any decision tree. See \code{\link{condition}}.
 #' @param text.condition Optional descriptive text for the condition.
 #' @param VCOV.nma Variance-covariance matrix for network estimates
 #'   (only considered if argument \code{TE.nma} isn't a
@@ -134,10 +64,9 @@ nmaEffects <- function(TE, Cov) {
 #' @export
 
 
-nmarank <- function(TE.nma, condition, text.condition = "",
+nmarank <- function(TE.nma, condition=NULL, text.condition = "",
                     VCOV.nma = NULL, pooled,
                     nsim = 10000, small.values) {
-  
   
   if (inherits(TE.nma, "netmeta")) {
     if (!is.null(VCOV.nma))
@@ -171,6 +100,10 @@ nmarank <- function(TE.nma, condition, text.condition = "",
     ##
     if (missing(pooled))
       pooled <- ""
+  }
+  ##
+  if (is.null(condition)){
+    condition <- condition("alwaysTRUE")
   }
   ##
   effects <- nmaEffects(TE.nma, VCOV.nma)

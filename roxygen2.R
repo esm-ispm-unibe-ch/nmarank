@@ -27,7 +27,7 @@ install("../nmarank")
 ##
 ## (5) Check R package
 ##
-check("../nmarank")
+check(env_vars = c(NOT_CRAN = "FALSE","_R_CHECK_CRAN_INCOMING_"=TRUE))
 
 
 ##

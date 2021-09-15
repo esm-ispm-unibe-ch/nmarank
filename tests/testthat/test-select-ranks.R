@@ -7,6 +7,11 @@ p1 <- pairwise(treatment, event = r, n = N,
 net1 <- netmeta(p1)
 net1
 
+test_that("Default execution of nmarank without condition", {
+  p1 = nmarank(net1)$probabilityOfSelection
+  expect_type(p1, "double")
+})
+
 A = condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
 B = condition("specificPosition", "Placebo", 1)
 C = condition("sameHierarchy", c("Placebo", "Fluticasone", "Salmeterol", "SFC"))
