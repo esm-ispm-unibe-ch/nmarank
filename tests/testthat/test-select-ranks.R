@@ -36,7 +36,7 @@ test_that("small.values='good' should give Placebo last for this mortality outco
 test_that("check Selection tree", {
   st = (A %OR% (B %XOR% (C %OR% (D %AND% G))))
   st1 = (B %XOR% (C %OR% (D %AND% G))) %OR% A
-  effs <- nmaEffects(net1$TE.random, net1$Cov.random)
+  effs <- nmarank:::nmaEffects(net1$TE.random, net1$Cov.random)
   ranksrow = effs$TE
   holds = selectionHolds(st, small.values="bad", ranksrow)
   expect_true(holds)

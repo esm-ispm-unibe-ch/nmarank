@@ -34,15 +34,13 @@
 #' @param \dots Additional arguments.
 #' 
 #' @return
+#' An object of class \code{"nmarank"} with corresponding \code{print}
+#' function. The object is a list containing the following components:
 #'
-#' An object of class \code{"nmarank"} with corresponding
-#' \code{print} function. The object is a list containing the
-#' following components:
-#'
-#' \item{hierarchies}{A list of the most frequent hierarchies along with their
-#' estimated probability of occurrence} 
-#' \item{probabilityOfSelection}{combined probability of all hierarchies that
-#' satisfy the defined condition}
+#' \item{hierarchies}{A list of the most frequent hierarchies along
+#'  with their estimated probability of occurrence.}
+#' \item{probabilityOfSelection}{Combined probability of all
+#'   hierarchies that satisfy the defined condition.}
 #' \item{TE.nma, condition, VCOV.nma,}{As defined above.}
 #' \item{pooled, nsim, small.values}{As defined above.}
 #'
@@ -52,14 +50,16 @@
 #' data("Woods2010", package = "netmeta")
 #' p1 <- pairwise(treatment, event = r, n = N, studlab = author,
 #'                data = Woods2010, sm = "OR")
-#' net1 <- netmeta(p1, small.values = "bad")
+#' net1 <- netmeta(p1, small.values = "good")
 #'
-#' nmarank(net1, condition("always"), nsim = 100)
+#' nmarank(net1, nsim = 100)
 #'
 #' criterionA <-
 #'  condition("sameHierarchy",
 #'            c("SFC", "Salmeterol", "Fluticasone", "Placebo"))
 #' nmarank(net1, criterionA, nsim = 100)
+#'
+#' @seealso \code{\link{condition}}, \code{\link[netmeta]{netmeta}}
 #' 
 #' @export
 
@@ -114,6 +114,46 @@ nmarank <- function(TE.nma, condition=NULL, text.condition = "",
   ##
   small.values <- setchar(small.values, c("bad", "good"))
   pooled <- setchar(pooled, c("fixed", "random", ""))
+  ##
+  trts <- rownames(TEs)
+  ##
+  if (condition$fn == "sameHierarchy") {
+    condition$args[[1]] <-
+      setseq(condition$args[[1]], trts,
+             error.text =
+               paste0("first argument of condition \"",
+                      condition$fn, "\""))
+  }
+  else if (condition$fn == "retainOrder")
+    condition$args[[1]] <-
+      setref(condition$args[[1]], trts, length = 0,
+             error.text =
+               paste0("first argument of condition \"",
+                      condition$fn, "\""))
+  else if (condition$fn %in%
+           c("specificPosition", "betterEqual", "biggerCIV")) {
+    condition$args[[1]] <-
+      setref(condition$args[[1]], trts, length = 1,
+             error.text =
+               paste0("first argument of condition \"",
+                      condition$fn, "\""))
+    ##
+    if (condition$fn %in% c("specificPosition", "betterEqual"))
+      chknumeric(condition$args[[2]], min = 1, max = length(trts),
+                 text = paste0("Second argument of condition \"",
+                               condition$fn, "\" ",
+                               "must be a single numeric ",
+                               "between 1 and ", length(trts),
+                               "."))
+    ##
+    if (condition$fn == "biggerCIV") {
+      condition$args[[2]] <-
+        setref(condition$args[[2]], trts, length = 1,
+               error.text =
+                 paste0("second argument of condition \"",
+                        condition$fn, "\""))
+    }
+  }
   
   
   leagueTableFromRelatives <- function(rels) {
@@ -198,40 +238,59 @@ print.nmarank <- function(x, text.condition = x$text.condition,
   cat(paste0("Treatment hierarchy", text.pooled, "\n\n"))
 
   if (x$condition$fn == "alwaysTRUE") {
-    x$hierarchies$Probability %>% round(digits = digits)
+    x$hierarchies$Probability <-
+      formatN(x$hierarchies$Probability, digits = digits)
     print(x$hierarchies[seq_len(min(nrow(x$hierarchies), nrows)), ], ...)
     if (nrows < nrow(x$hierarchies))
       cat("...\n")
   }
-  else if (x$condition$fn == "sameHierarchy") {
+  else if (x$condition$fn == "sameHierarchy")
     cat(paste0("Probability of hierarchy '",
                paste(x$condition$args[[1]], collapse = ", "),
                "': ",
-               x$probabilityOfSelection %>% round(digits = digits),
+               x$probabilityOfSelection %>% formatN(digits = digits),
                "\n"))
-  }
-  else if (x$condition$fn == "retainOrder") {
+  else if (x$condition$fn == "retainOrder")
     cat(paste0("Probability that order '",
                paste(x$condition$args[[1]], collapse = ", "),
                "' is retained anywhere in the hierarchy: ",
-               x$probabilityOfSelection %>% round(digits = digits),
+               x$probabilityOfSelection %>% formatN(digits = digits),
                "\n"))
-  }
-  else if (x$condition$fn == "betterEqual") {
+  else if (x$condition$fn == "specificPosition")
     cat(paste0("Probability that '",
                x$condition$args[[1]],
-               "' is among the best ", x$condition$args[[2]],
-               " options: ",
-               x$probabilityOfSelection %>% round(digits = digits),
+               "' is at rank position ", x$condition$args[[2]],
+               ": ",
+               x$probabilityOfSelection %>% formatN(digits = digits),
                "\n"))
-  }
-  else {
+  else if (x$condition$fn == "betterEqual")
+    cat(paste0("Probability that '",
+               x$condition$args[[1]],
+               "' is among the best ",
+               if (x$condition$args[[2]] <= 10)
+                 c("two", "three", "four",
+                   "five", "six", "seven", "eight", "nine",
+                   "ten")[match(x$condition$args[[2]], 2:10)]
+               else
+                 x$condition$args[[2]],
+               " options: ",
+               x$probabilityOfSelection %>% formatN(digits = digits),
+               "\n"))
+  else if (x$condition$fn == "biggerCIV")
+    cat(paste0("Probability that '",
+               x$condition$args[[1]],
+               "' is better than '", x$condition$args[[2]],
+               "' by more than ",
+               x$condition$args[[3]],
+               " (CIV): ",
+               x$probabilityOfSelection %>% formatN(digits = digits),
+               "\n"))
+  else
     cat(paste0("Probability", if (text.condition != "") " that ",
                text.condition,
                ": ",
-               x$probabilityOfSelection %>% round(digits = digits),
+               x$probabilityOfSelection %>% formatN(digits = digits),
                "\n"))
-  }
   ##
   invisible(NULL)
 }

@@ -19,66 +19,87 @@ Defines a condition that is of interest to be satisfied involving a set of
 treatments in the network.
 }
 \details{
-Each implemented condition function needs a specific set of arguments. 
-Available conditions and their accompanying arguments are:
-\itemize{
- \item{"sameHierarchy": }{Testing that a specified hierarchy occurs with
- arguments a vector of length equal to the number of treatments in the
- network }
-\item{"specificPosition": }{A treatment ranks in a specific position with
-arguments a list including the name of the treatment and its position}
-\item{"retainOrder": }{The order of two or more treatments is retained in the
-hierarchy with arguments a vector of length smaller or equal to the number of
-treatments in the network with the specified order to be retained}
-\item{"betterEqual": }{A treatment has a position better or equal to a
-specific rank with arguments a list including the name of the treatment and
-the set position} 
-\item{"biggerCIV": }{The effect of the first treatment is bigger than that of
-the second by more than a given clinically important value with arguments: a
-vector of length 3 with the first and second treatment and the clinically
-important value in an additive scale (e.g. log odds ratio, log risk ratio,
-mean difference). Note that the actual value of the relative effect is considered
-independently of whether \code{small.values} is \code{"good"} or \code{"bad"} }
-}
+The following types of conditions are available.
 
-Condition composition:
+The condition \code{fn = "sameHierarchy"} checks whether a specific
+hierarchy occurs. One additional unnamed argument has to be
+provided in '\dots': a vector with a permutation of all treatment
+names in the network.
 
-Conditions can be combined to express more complex decision trees. This
-can be done by using the special operators \%AND\% \%OR\% \%XOR\% and the
-\code{opposite} function. The combination should be defined as a binary
-tree with the use of parentheses. If A,B,C,D are conditions we can for
-example combine them into E as \code{E=A \%AND\% (B \%OR\% (opposite(C) \%XOR\% D))}
+The condition \code{fn = "specificPosition"} checks whether a
+treatment ranks in a specific position. Two additional unnamed
+arguments have to be provided in '\dots': (1) name of the treatment
+of interest and (2) a single numeric specifying the rank position.
+
+The condition \code{fn = "betterEqual"} checks whether a treatment
+has a position better or equal to a specific rank. Two additional
+unnamed arguments have to be provided in '\dots': (1) name of the
+treatment of interest and (2) a single numeric specifying the rank
+position.
+
+The condition \code{fn = "retainOrder"} checks whether a specific
+order of two or more treatments is retained anywhere in the
+hierarchy. One additional unnamed argument has to be provided in
+'\dots': a vector with two or more treatment names providing the
+order of treatments.
+
+The condition \code{fn = "biggerCIV"} checks whether the effect of
+a treatment is bigger than that of a second treatment by more than
+a given clinically important value (CIV) on an additive scale
+(e.g. log odds ratio, log risk ratio, mean difference). Three
+additional unnamed arguments have to be provided in '\dots': (1)
+name of the first treatment, (2) name of the second treatment and
+(3) a numerical value for the CIV. Note that the actual value of
+the relative effect is considered independently of whether
+\code{small.values} is \code{"good"} or \code{"bad"}.
+
+\bold{Composition of conditions for more complex queries:}
+
+Conditions can be combined to express more complex decision
+trees. This can be done by using the special operators \%AND\%,
+\%OR\%, \%XOR\% and the \code{opposite} function. The combination
+should be defined as a binary tree with the use of parentheses. If
+A, B, C and D are conditions, we can for example combine them into
+a complex condition E:
+
+\code{E = A \%AND\% (B \%OR\% (opposite(C) \%XOR\% D))}
 }
 \examples{
 data("Woods2010", package = "netmeta")
 p1 <- pairwise(treatment, event = r, n = N, studlab = author,
                data = Woods2010, sm = "OR")
-net1 <- netmeta(p1, small.values = "bad")
+net1 <- netmeta(p1, small.values = "good")
 
-#criterionA if all treatments are in the exact order defined
+# criterionA if all treatments are in the exact defined order
 criterionA <-
 condition("sameHierarchy",
-        c("SFC", "Salmeterol", "Fluticasone", "Placebo"))
+          c("SFC", "Salmeterol", "Fluticasone", "Placebo"))
 
-#criterionB respects the relative order of two or more treatments
+# criterionB respects the relative order of two or more treatments
 criterionB <-
   condition("retainOrder",
-             c("SFC", "Fluticasone", "Placebo"))
+            c("SFC", "Fluticasone", "Placebo"))
 
-# Below we define the condition that SFC and Salmeterol are in the first two
-#positions. We first define the conditions that each one of them is in
-#position 1 or 2
+# Below we define the condition that SFC and Salmeterol are in the
+# first two positions.
+
+# We first define conditions that each one of them is in position 1
+# or 2 
 criterionC1 <- condition("betterEqual", "SFC", 2)
 criterionC2 <- condition("betterEqual", "Salmeterol", 2)
-#We then combine them with \%AND\%
+# We then combine them with operator \%AND\%
 criterionC <- criterionC1 \%AND\% criterionC2
-#Next we can feed the condition into nmarank to get the probability of the
-#selection
+
+# Next we can feed the condition into nmarank to get the
+# probability of the selection
 nmarank(net1, criterionC,
         text.condition =
-        "SFC and Salmeterol are the two best options", nsim=100)
+        "SFC and Salmeterol are the two best options", nsim = 100)
 
-#We can further combine criteria
+# We can further combine criteria
 criterionD <- criterionA \%AND\% (criterionB \%OR\% opposite(criterionC))
 
+}
+\seealso{
+\code{\link{nmarank}}
 }
