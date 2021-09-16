@@ -56,14 +56,13 @@ see \code{print.default}.}
 \item{\dots}{Additional arguments.}
 }
 \value{
-An object of class \code{"nmarank"} with corresponding
-\code{print} function. The object is a list containing the
-following components:
+An object of class \code{"nmarank"} with corresponding \code{print}
+function. The object is a list containing the following components:
 
-\item{hierarchies}{A list of the most frequent hierarchies along with their
-estimated probability of occurrence} 
-\item{probabilityOfSelection}{combined probability of all hierarchies that
-satisfy the defined condition}
+\item{hierarchies}{A list of the most frequent hierarchies along
+ with their estimated probability of occurrence.}
+\item{probabilityOfSelection}{Combined probability of all
+  hierarchies that satisfy the defined condition.}
 \item{TE.nma, condition, VCOV.nma,}{As defined above.}
 \item{pooled, nsim, small.values}{As defined above.}
 }
@@ -83,13 +82,16 @@ certainty around the criterion.
 data("Woods2010", package = "netmeta")
 p1 <- pairwise(treatment, event = r, n = N, studlab = author,
                data = Woods2010, sm = "OR")
-net1 <- netmeta(p1, small.values = "bad")
+net1 <- netmeta(p1, small.values = "good")
 
-nmarank(net1, condition("always"), nsim = 100)
+nmarank(net1, nsim = 100)
 
 criterionA <-
  condition("sameHierarchy",
            c("SFC", "Salmeterol", "Fluticasone", "Placebo"))
 nmarank(net1, criterionA, nsim = 100)
 
+}
+\seealso{
+\code{\link{condition}}, \code{\link[netmeta]{netmeta}}
 }
