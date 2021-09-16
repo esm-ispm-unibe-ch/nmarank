@@ -44,7 +44,7 @@ bug.report(package = "nmarank")
 ```
 
 The bug.report function is not supported in RStudio. Please send an
-email to Theodoros Papakonstantinouer <dev@tpapak.com> if you use
+email to Theodoros Papakonstantinou <dev@tpapak.com> if you use
 RStudio.
 
 You can also report bugs on GitHub under
