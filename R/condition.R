@@ -200,7 +200,7 @@ condition <- function(fn, ...) {
 #' A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
 #' B <- condition("betterEqual", "Fluticasone", 2)
 #'
-#' nmarank(net1, A %AND% B, nsim=5000)
+#' nmarank(net1, A %AND% B, nsim=500)
 #'
 #' @seealso \code{\link{condition}}, \code{\link{nmarank}}
 #'
@@ -238,7 +238,7 @@ condition <- function(fn, ...) {
 #' A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
 #' B <- condition("betterEqual", "Fluticasone", 2)
 #'
-#' nmarank(net1, A %OR% B, nsim=5000)
+#' nmarank(net1, A %OR% B, nsim=500)
 #'
 #' @seealso \code{\link{condition}}, \code{\link{nmarank}}
 #' 

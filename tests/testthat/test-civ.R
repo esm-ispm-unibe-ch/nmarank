@@ -18,7 +18,7 @@ test_that("bigger civ gives smaller probability", {
 
 
 test_that("civ of 0 gives the same probability as A > B", {
-  C = condition("retainOrder", "SFC", "Fluticasone")
+  C = condition("retainOrder", c("SFC", "Fluticasone"))
   D = condition("biggerCIV", "SFC", "Fluticasone", 0)
   p1 = nmarank(net1, C %XOR% D)
   expect_equal(p1$probabilityOfSelection, 0)
