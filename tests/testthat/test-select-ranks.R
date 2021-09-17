@@ -1,4 +1,3 @@
-rm(list=ls())
 data("Woods2010")
 
 p1 <- pairwise(treatment, event = r, n = N,
