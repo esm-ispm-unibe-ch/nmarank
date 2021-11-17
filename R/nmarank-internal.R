@@ -3,6 +3,7 @@
 #' @importFrom rlang is_empty 
 #' @importFrom rlang .data
 #' 
+#' @export
 nmaEffects <- function(TE, Cov) {
   
   if (!all(rownames(Cov) == colnames(Cov))) {
