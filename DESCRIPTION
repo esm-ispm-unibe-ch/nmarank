@@ -1,32 +1,27 @@
 Package: nmarank
-Type: Package
-Title: Precision in treatment ranking
-Version: 0.1.0
-Date: 2020-04-08
-Authors@R: c( person("Adriani", "Nikolakopoulou",
+Title: Complex Hierarchy Questions in Network Meta-Analysis
+Version: 0.2-3
+Date: 2021-09-16
+Depends: R (>= 3.3.1), meta (>= 4.19-1), netmeta (>= 1.5-0),
+         data.tree, mvtnorm, tidyr
+Imports: dplyr, tibble, rlang
+Suggests: testthat
+Authors@R: c(person("Adriani", "Nikolakopoulou",
+                    role = "aut"),
+             person("Guido", "Schwarzer",
+                    role = "aut",
+                    comment = c(ORCID = "0000-0001-6214-9087")),
+            person("Theodoros", "Papakonstantinou",
                     role = c("aut", "cre"),
-                    email = "nikolakopoulou.adriani@gmail.com"
-                    )
-            , person("Theodoros", "Papakonstantinou",
-                    role = c("aut"),
+                    email = "dev@tpapak.com",
                     comment = c(ORCID = "0000-0002-6630-6817"))
             )
-Description: Provides probability matrix of the most frequent treatment rankings
-  by sampling the multivariate normal of the NMA effect sizes. One can also
-  describe complex selection ranking criteria through a simple syntax and basic
-  functions introduced and calculate their probability. Netmeta
-  can be used for analysis or an existing league table can be provided.
+Author: Adriani Nikolakopoulou [aut],
+  Guido Schwarzer [aut] (<https://orcid.org/0000-0001-6214-9087>),
+  Theodoros Papakonstantinou [aut, cre] (<https://orcid.org/0000-0002-6630-6817>)
+Maintainer: Theodoros Papakonstantinou <dev@tpapak.com>
+URL: https://github.com/esm-ispm-unibe-ch/nmarank
+Description: Derives the most frequent hierarchies along with their probability of occurrence. One can also define complex hierarchy criteria and calculate their probability. Methodology based on Papakonstantinou et al. (2021) <DOI:10.21203/rs.3.rs-858140/v1>.
 License: GPL-3
-LazyLoad: Yes
-Depends: R (>= 3.3.1)
-       , netmeta (>= 1.0-1)
-       , data.tree
-       , mvtnorm
-       , devtools
-       , dplyr
-       , tidyverse
-Suggests: 
-    alternativenma,
-    testthat
 Encoding: UTF-8
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2

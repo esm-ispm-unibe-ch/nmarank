@@ -19,41 +19,40 @@ View(ranks$hierarchies)
 # Calculate probabilities of hierarchies that satisfy a set of criteria
 
 #criterion A and its probability
-criterionA = list( fn = "isthesamehierarchy"
-                 , args = c("SFC", "Salmeterol", "Fluticasone", "Placebo"))
-ranksA = nmarank(net1,nsim=10000,small.values = "good", predicate=criterionA)
+criterionA = condition("sameHierarchy", c("SFC", "Salmeterol", "Fluticasone", "Placebo"))
+ranksA = nmarank(net1,nsim=10000,small.values = "good", condition=criterionA)
 print(paste("probability that hierarchy is "
            ,"SFC, Salmeterol, Fluticasone, Placebo’: "
            , ranksA$probabilityOfSelection
            , sep=""))
 
 #criterion B and its probability
-criterionB = list(fn = "retainOrder"
-                 , args = c("SFC", "Fluticasone", "Placebo"))
-ranksB = nmarank(net1,nsim=10000,small.values = "good", predicate=criterionB)
+criterionB = condition("retainOrder"
+                      ,c("SFC", "Fluticasone", "Placebo"))
+ranksB = nmarank(net1,nsim=10000,small.values = "good", condition=criterionB)
 print(paste("probability that order "
    ,"‘SFC, Fluticasone, Placebo’ is retained anywhere in the hierarchy: ",
         ranksB$probabilityOfSelection,
         sep=""))
 
 #criterion C and its probability
-criterionC = list(fn = "betterEqual", args = list("Fluticasone", 2))
-ranksC = nmarank(net1,nsim=10000,small.values = "good", predicate=criterionC)
+criterionC = condition("betterEqual", "Fluticasone", 2)
+ranksC = nmarank(net1,nsim=10000,small.values = "good", condition=criterionC)
 print(paste("probability that Fluticasone is among the best two options: ",
         ranksC$probabilityOfSelection
         ,sep=""))
 
 #criterion D and its probability
-seD1 = list(fn = "betterEqual", args = list("SFC", 2))
-seD2 = list(fn = "betterEqual", args = list("Salmeterol", 2))
+seD1 = condition("betterEqual", "SFC", 2)
+seD2 = condition("betterEqual", "Salmeterol", 2)
 criterionD = (seD1 %AND% seD2)
-ranksD = nmarank(net1,nsim=10000,small.values = "good", predicate=criterionD)
+ranksD = nmarank(net1,nsim=10000,small.values = "good", condition=criterionD)
 print(paste("probability that SFC and Salmeterol are the two best options: ",
         ranksD$probabilityOfSelection,sep=""))
 
 #criterion E and its probability
 criterionE = criterionB %AND% criterionC
-ranksE = nmarank(net1,nsim=10000,small.values = "good", predicate=criterionE)
+ranksE = nmarank(net1,nsim=10000,small.values = "good", condition=criterionE)
 print(paste("probability that criteria B and C are satisfied: ",
         ranksE$probabilityOfSelection, sep=""))
 
