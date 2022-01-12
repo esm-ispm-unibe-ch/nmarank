@@ -62,8 +62,6 @@
 #' @seealso \code{\link{condition}}, \code{\link[netmeta]{netmeta}}
 #' 
 #' @export
-
-
 nmarank <- function(TE.nma, condition=NULL, text.condition = "",
                     VCOV.nma = NULL, pooled,
                     nsim = 10000, small.values) {
@@ -111,6 +109,7 @@ nmarank <- function(TE.nma, condition=NULL, text.condition = "",
   TEs <- effects$TE
   REs <- effects$RE
   Covs <- effects$Cov
+
   ##
   small.values <- setchar(small.values, c("bad", "good"))
   pooled <- setchar(pooled, c("fixed", "random", ""))
@@ -154,7 +153,32 @@ nmarank <- function(TE.nma, condition=NULL, text.condition = "",
                         condition$fn, "\""))
     }
   }
+  sampleTEs <- function(TEs,var){
+  theta <- TEs[1,]
+  n.trts <- length(theta)
+  comps <- rownames(var)
+
+  vList <- unlist(sapply(comps,function(comp){
+                    cmp=strsplit(comp,split=":")[[1]]
+                    row <- lapply(trts, function(treat){
+                        out=0
+                        if(treat==cmp[1] | treat==cmp[2]){out=1}
+                        else{out=0}
+                      return(out)
+                      })
+                    return(unlist(row))
+            }) 
+          )
+  vMatrix <- t(as.matrix(vList))
+  colnames(vMatrix)<-trts
   
+  var.theta <- as.vector(MASS::ginv(vMatrix) %*% diag(var))
+  
+  sample <- mvtnorm::rmvnorm(nsim, theta, diag(var.theta))
+  rownames(sample) <- seq_len(nrow(sample))
+  colnames(sample) <- trts
+  return(sample)
+  }
   
   leagueTableFromRelatives <- function(rels) {
     lgtbl <- matrix(0, nrow = nrow(TEs), ncol = ncol(TEs),
@@ -165,19 +189,23 @@ nmarank <- function(TE.nma, condition=NULL, text.condition = "",
     lgtbl[lower.tri(lgtbl)] <- -rels
     lgtbl
   }
+  leagueTableFromAbsolutes <- function(thetas){
+    lg <- expand.grid(thetas,thetas)
+    lgtbl <- t(matrix(lg[,1]-lg[,2],ncol=length(thetas)
+                     ,dimnames = list(names(thetas), names(thetas))))
+    return(lgtbl)
+  }
   
   
   if (is.null(condition$root))
     condition <- makeNode(condition)
   
-  
-  rels <- mvtnorm::rmvnorm(nsim, REs, Covs, checkSymmetry = FALSE)
-  
+  rels <- sampleTEs(TEs, Covs)
   
   hitsranks <-
     Reduce(function(acc, i) {
       x <- rels[i, ]
-      leagueT <- leagueTableFromRelatives(x)
+      leagueT <- leagueTableFromAbsolutes(x)
       if (selectionHolds(condition, small.values, leagueT))
         newhits <- acc$hits + 1
       else
@@ -203,7 +231,6 @@ nmarank <- function(TE.nma, condition=NULL, text.condition = "",
   ranks <- data.frame(Hierarchy = hitsranks$ranks %>% names(),
                       Probability = hitsranks$ranks / nsim,
                       row.names = seq_along(hitsranks$ranks))
-  
   
   res <- list(hierarchies = ranks,
               probabilityOfSelection = hitsranks$hits / nsim,
