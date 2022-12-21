@@ -1,9 +1,9 @@
 *~
 *.bak
-kenscore.o
-meta.so
-src-x86_64
 symbols.rds
-.Rhistory
-.DS_Store
 .Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+roxygen2-*.R
+.DS_Store

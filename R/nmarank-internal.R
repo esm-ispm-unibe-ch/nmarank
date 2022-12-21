@@ -2,8 +2,9 @@
 #' @importFrom stats runif
 #' @importFrom rlang is_empty 
 #' @importFrom rlang .data
-#' 
-#' @export
+#' @importFrom stats runif
+
+
 nmaEffects <- function(TE, Cov) {
   
   if (!all(rownames(Cov) == colnames(Cov))) {
@@ -88,4 +89,3 @@ selectionHolds <- function(node, small.values, leagueTable) {
 }
 
 
-#' @importFrom stats runif
