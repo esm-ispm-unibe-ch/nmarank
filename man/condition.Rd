@@ -15,8 +15,8 @@ condition(fn, ...)
 A list with the defined function and its arguments.
 }
 \description{
-Defines a condition that is of interest to be satisfied involving a set of
-treatments in the network.
+Defines a condition that is of interest to be satisfied involving a
+set of treatments in the network.
 }
 \details{
 The following types of conditions are available.
@@ -51,7 +51,7 @@ additional unnamed arguments have to be provided in '\dots': (1)
 name of the first treatment, (2) name of the second treatment and
 (3) a numerical value for the CIV. Note that the actual value of
 the relative effect is considered independently of whether
-\code{small.values} is \code{"good"} or \code{"bad"}.
+\code{small.values} is \code{"desirable"} or \code{"undesirable"}.
 
 \bold{Composition of conditions for more complex queries:}
 

@@ -1,8 +1,13 @@
+#' @importFrom MASS ginv
 #' @importFrom tidyr pivot_longer unite
 #' @importFrom stats runif
-#' @importFrom rlang is_empty 
-#' @importFrom rlang .data
+#' @importFrom rlang is_empty .data
 #' @importFrom stats runif
+#' @importFrom mvtnorm rmvnorm
+#' @importFrom netmeta netmeta
+#' @importFrom dplyr %>% filter
+#' @importFrom tibble rownames_to_column
+#' @importFrom data.tree FromListExplicit
 
 
 nmaEffects <- function(TE, Cov) {
@@ -89,3 +94,17 @@ selectionHolds <- function(node, small.values, leagueTable) {
 }
 
 
+setsv <- function(x) {
+  if (is.null(x))
+    res <- "desirable"
+  else {
+    res <- setchar(x, c("good", "bad"), stop.at.error = FALSE)
+    ##
+    if (!is.null(res))
+      res <- switch(res, good = "desirable", bad = "undesirable")
+    else
+      res <- x
+  }
+  ##
+  setchar(res, c("desirable", "undesirable"))
+}

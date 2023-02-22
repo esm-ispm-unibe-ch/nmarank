@@ -1,5 +1,11 @@
 ## nmarank, version 0.3-0 (2022-mm-dd)
 
+### User-visible changes
+
+* nmarank():
+  - possible values "desirable" and "undesirable" instead of "good"
+    and "bad" for argument 'small.values'
+
 ### Internal changes
 
 * R package **MASS** added to imports

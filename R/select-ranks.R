@@ -1,6 +1,6 @@
 getRank <- function(leagueTable, small.values) {
   res <- sort(leagueTable[1, ],
-              decreasing = small.values == "good") %>% names() 
+              decreasing = small.values == "desirable") %>% names() 
   ##
   res
 }

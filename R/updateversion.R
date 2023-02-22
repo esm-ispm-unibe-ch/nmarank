@@ -19,6 +19,7 @@ updateversion <- function(x, verbose = FALSE) {
     update.1.3.0 <- update_needed(x$version, 1, 3, verbose)
     update.2.0.0 <- update_needed(x$version, 2, 0, verbose)
     update.2.5.0 <- update_needed(x$version, 2, 5, verbose)
+    update.2.8.0 <- update_needed(x$version, 2, 8, verbose)
     ##
     if (update.1.3.0) {
       x$statistic.fixed <- x$zval.fixed
@@ -111,9 +112,12 @@ updateversion <- function(x, verbose = FALSE) {
       x$P.common <- x$P.fixed
       x$Cov.common <- x$Cov.fixed               
     }
+    ##
+    if (update.2.8.0)
+      x$small.values <- setsv(x$small.values)
+    ##
+    return(x)
   }
-
-  x
 }
 
 

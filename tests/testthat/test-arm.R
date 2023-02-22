@@ -1,11 +1,13 @@
 data("Woods2010")
 
 #Old relative effects multivariate sampling
-nmarank2 <- function(TE.nma, condition=NULL, text.condition = "",
-                    VCOV.nma = NULL, pooled,
-                    nsim = 10000, small.values) {
+nmarank2 <- function(TE.nma, condition = NULL, text.condition = "",
+                     VCOV.nma = NULL, pooled,
+                     nsim = 10000, small.values) {
   
   if (inherits(TE.nma, "netmeta")) {
+    TE.nma <- updateversion(TE.nma)
+    ##
     if (!is.null(VCOV.nma))
       warning("Argument 'VCOV.nma' ignored for objects of type 'netmeta'.",
               call. = FALSE)
@@ -14,16 +16,16 @@ nmarank2 <- function(TE.nma, condition=NULL, text.condition = "",
       small.values <- TE.nma$small.values
     ##
     if (missing(pooled))
-      if ((TE.nma$comb.fixed == FALSE) |
-          (TE.nma$comb.fixed == TRUE & TE.nma$comb.random == TRUE)) {
+      if ((TE.nma$common == FALSE) |
+          (TE.nma$common == TRUE & TE.nma$random == TRUE)) {
         pooled <- "random"
         VCOV.nma <- TE.nma$Cov.random
         TE.nma <- TE.nma$TE.random
       }
       else {
-        pooled <- "fixed"
-        VCOV.nma <- TE.nma$Cov.fixed
-        TE.nma <- TE.nma$TE.fixed
+        pooled <- "common"
+        VCOV.nma <- TE.nma$Cov.common
+        TE.nma <- TE.nma$TE.common
       }
   }
   else {
@@ -33,7 +35,7 @@ nmarank2 <- function(TE.nma, condition=NULL, text.condition = "",
               call. = FALSE)
     ##
     if (missing(small.values))
-      small.values <- "bad"
+      small.values <- "undesirable"
     ##
     if (missing(pooled))
       pooled <- ""
@@ -49,8 +51,8 @@ nmarank2 <- function(TE.nma, condition=NULL, text.condition = "",
   REs <- effects$RE
   Covs <- effects$Cov
   ##
-  small.values <- setchar(small.values, c("bad", "good"))
-  pooled <- setchar(pooled, c("fixed", "random", ""))
+  small.values <- setsv(small.values)
+  pooled <- setchar(pooled, c("common", "random", ""))
   ##
   trts <- rownames(TEs)
   ##
@@ -108,7 +110,7 @@ nmarank2 <- function(TE.nma, condition=NULL, text.condition = "",
     condition <- makeNode(condition)
   
   
-  rels <- mvtnorm::rmvnorm(nsim, REs, Covs, checkSymmetry = FALSE)
+  rels <- rmvnorm(nsim, REs, Covs, checkSymmetry = FALSE)
   
   hitsranks <-
     Reduce(function(acc, i) {
@@ -152,7 +154,6 @@ nmarank2 <- function(TE.nma, condition=NULL, text.condition = "",
   res
 }
 
-#' @export
 
 p1 <- pairwise(treatment, event = r, n = N,
                studlab = author, data = Woods2010, sm = "OR")
@@ -162,25 +163,24 @@ net1 <- netmeta(p1, small.values = "good")
 effs <- nmarank:::nmaEffects(net1$TE.random, net1$Cov.random)
 
 test_that("arm gives correct ranks", {
-  A = condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
-  rank1 = nmarank(net1, A, nsim=3000,small.values="bad")
-  rank2 = nmarank2(net1, A, nsim=3000,small.values="bad")
-  rank3 = nmarank(net1, A, nsim=3000,small.values="good")
-  rank4 = nmarank2(net1, A, nsim=3000,small.values="good")
-  p1 <- rank1$hierarchies[1:3,]
-  p2 <- rank2$hierarchies[1:3,]
-  p3 <- rank3$hierarchies[1:3,]
-  p4 <- rank4$hierarchies[1:3,]
-  expect_true(all(p1$Hierarchy==p2$Hierarchy) &
-               all(p3$Hierarchy==p4$Hierarchy))
+  A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
+  rank1 <- nmarank(net1, A, nsim = 3000, small.values = "undesirable")
+  rank2 <- nmarank2(net1, A, nsim = 3000, small.values = "undesirable")
+  rank3 <- nmarank(net1, A, nsim = 3000, small.values = "desirable")
+  rank4 <- nmarank2(net1, A, nsim = 3000, small.values = "desirable")
+  p1 <- rank1$hierarchies[1:3, ]
+  p2 <- rank2$hierarchies[1:3, ]
+  p3 <- rank3$hierarchies[1:3, ]
+  p4 <- rank4$hierarchies[1:3, ]
+  expect_true(all(p1$Hierarchy == p2$Hierarchy) &
+               all(p3$Hierarchy == p4$Hierarchy))
 })
 
 test_that("arm gives correct probs", {
-  A = condition("biggerCIV", "SFC", "Fluticasone", 0.1)
-  rank1 = nmarank(net1, A, nsim=10000)
-  rank2 = nmarank2(net1, A, nsim=10000)
+  A <- condition("biggerCIV", "SFC", "Fluticasone", 0.1)
+  rank1 <- nmarank(net1, A, nsim = 10000)
+  rank2 <- nmarank2(net1, A, nsim = 10000)
   p1 <- rank1$probabilityOfSelection
   p2 <- rank2$probabilityOfSelection
-  expect_lte(abs(p1-p2),0.02)
+  expect_lte(abs(p1 - p2), 0.02)
 })
-

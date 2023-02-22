@@ -1,8 +1,8 @@
 #' Define which hierarchies to select
 #' 
 #' @description
-#' Defines a condition that is of interest to be satisfied involving a set of
-#' treatments in the network. 
+#' Defines a condition that is of interest to be satisfied involving a
+#' set of treatments in the network.
 #' 
 #' @param fn Character string specifiying type of condition.
 #' @param \dots Function arguments.
@@ -40,7 +40,7 @@
 #' name of the first treatment, (2) name of the second treatment and
 #' (3) a numerical value for the CIV. Note that the actual value of
 #' the relative effect is considered independently of whether
-#' \code{small.values} is \code{"good"} or \code{"bad"}.
+#' \code{small.values} is \code{"desirable"} or \code{"undesirable"}.
 #' 
 #' \bold{Composition of conditions for more complex queries:}
 #' 
@@ -246,7 +246,7 @@ condition <- function(fn, ...) {
 
 `%OR%` <- function(cond1, cond2) {
   nl <- list(id = makeID("OR"),
-             fn ="OR",
+             fn = "OR",
              arguments = {},
              operation = "combinator")
   ##
@@ -284,7 +284,7 @@ condition <- function(fn, ...) {
 
 `%XOR%` <- function(cond1, cond2) {
   nl <- list(id = makeID("XOR"),
-             fn ="XOR",
+             fn = "XOR",
              arguments = {},
              operation = "combinator")
   ##
@@ -320,12 +320,12 @@ condition <- function(fn, ...) {
 
 opposite <- function(cond) {
   nl <- list(id = makeID("NOT"),
-             fn ="NOT",
+             fn = "NOT",
              arguments = {},
              operation = "reversor")
   ##
-  nodeout = FromListExplicit(nl, nameName="id")
-  node = makeNode(cond)
+  nodeout <- FromListExplicit(nl, nameName = "id")
+  node <- makeNode(cond)
   nodeout$AddChildNode(node)
   ##
   nodeout

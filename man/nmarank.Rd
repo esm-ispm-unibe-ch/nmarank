@@ -45,7 +45,7 @@ effects model (\code{"random"}). Can be abbreviated.}
 \item{nsim}{Number of simulations.}
 
 \item{small.values}{A character string specifying whether small
-treatment effects indicate a "good" or "bad" effect.}
+treatment effects indicate a "desirable" or "undesirable" effect.}
 
 \item{x}{A \code{\link{nmarank}} object.}
 

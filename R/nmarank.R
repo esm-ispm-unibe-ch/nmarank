@@ -28,7 +28,7 @@
 #'   effects model (\code{"random"}). Can be abbreviated.
 #' @param nsim Number of simulations.
 #' @param small.values A character string specifying whether small
-#'   treatment effects indicate a "good" or "bad" effect.
+#'   treatment effects indicate a "desirable" or "undesirable" effect.
 #' @param x A \code{\link{nmarank}} object.
 #' @param nrows Number of hierarchies to print.
 #' @param digits Minimal number of significant digits for proportions,
@@ -46,9 +46,6 @@
 #' \item{TE.nma, condition, VCOV.nma,}{As defined above.}
 #' \item{pooled, nsim, small.values}{As defined above.}
 #'
-#' @import netmeta mvtnorm dplyr tibble data.tree
-#' @importFrom MASS ginv
-#' 
 #' @examples
 #' data("Woods2010", package = "netmeta")
 #' p1 <- pairwise(treatment, event = r, n = N, studlab = author,
@@ -65,10 +62,14 @@
 #' @seealso \code{\link{condition}}, \code{\link[netmeta]{netmeta}}
 #' 
 #' @export
-nmarank <- function(TE.nma, condition=NULL, text.condition = "",
+
+
+nmarank <- function(TE.nma, condition = NULL, text.condition = "",
                     VCOV.nma = NULL, pooled,
                     nsim = 10000, small.values) {
   
+  missing.small.values <- missing(small.values)
+  ##
   if (inherits(TE.nma, "netmeta")) {
     TE.nma <- updateversion(TE.nma)
     ##
@@ -76,7 +77,7 @@ nmarank <- function(TE.nma, condition=NULL, text.condition = "",
       warning("Argument 'VCOV.nma' ignored for objects of type 'netmeta'.",
               call. = FALSE)
     ##
-    if (missing(small.values))
+    if (missing.small.values)
       small.values <- TE.nma$small.values
     ##
     if (missing(pooled))
@@ -97,8 +98,8 @@ nmarank <- function(TE.nma, condition=NULL, text.condition = "",
               "'TE.nma' isn't a 'netmeta' object.",
               call. = FALSE)
     ##
-    if (missing(small.values))
-      small.values <- "bad"
+    if (missing.small.values)
+      small.values <- "undesirable"
     ##
     if (missing(pooled))
       pooled <- ""
@@ -113,9 +114,9 @@ nmarank <- function(TE.nma, condition=NULL, text.condition = "",
   TEs <- effects$TE
   REs <- effects$RE
   Covs <- effects$Cov
-
   ##
-  small.values <- setchar(small.values, c("bad", "good"))
+  small.values <- setsv(small.values)
+  ##
   pooled <- setchar(pooled, c("common", "random", "fixed", ""))
   pooled[pooled == "fixed"] <- "common"
   ##
