@@ -20,13 +20,13 @@ Combine selections with XOR
 \examples{
 data("Woods2010", package = "netmeta")
 p1 <- pairwise(treatment, event = r, n = N, studlab = author,
-               data = Woods2010, sm = "OR")
+  data = Woods2010, sm = "OR")
 net1 <- netmeta(p1, small.values = "good")
 
 A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
 B <- condition("betterEqual", "Fluticasone", 2)
 
-nmarank(net1, A \%XOR\% B, nsim=3000)
+nmarank(net1, A \%XOR\% B, nsim = 3000)
 
 }
 \seealso{

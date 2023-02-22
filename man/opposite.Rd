@@ -20,11 +20,11 @@ condition
 \examples{
 data("Woods2010", package = "netmeta")
 p1 <- pairwise(treatment, event = r, n = N, studlab = author,
-               data = Woods2010, sm = "OR")
+  data = Woods2010, sm = "OR")
 net1 <- netmeta(p1, small.values = "good")
 
 A = condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
-nmarank(net1, opposite(A), text.condition = "NOT order P-S-S", nsim=5000)
+nmarank(net1, opposite(A), text.condition = "NOT order P-S-S", nsim = 5000)
 
 }
 \seealso{

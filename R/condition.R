@@ -1,8 +1,8 @@
 #' Define which hierarchies to select
 #' 
 #' @description
-#' Defines a condition that is of interest to be satisfied involving a set of
-#' treatments in the network. 
+#' Defines a condition that is of interest to be satisfied involving a
+#' set of treatments in the network.
 #' 
 #' @param fn Character string specifiying type of condition.
 #' @param \dots Function arguments.
@@ -40,7 +40,7 @@
 #' name of the first treatment, (2) name of the second treatment and
 #' (3) a numerical value for the CIV. Note that the actual value of
 #' the relative effect is considered independently of whether
-#' \code{small.values} is \code{"good"} or \code{"bad"}.
+#' \code{small.values} is \code{"desirable"} or \code{"undesirable"}.
 #' 
 #' \bold{Composition of conditions for more complex queries:}
 #' 
@@ -59,18 +59,18 @@
 #' @examples
 #' data("Woods2010", package = "netmeta")
 #' p1 <- pairwise(treatment, event = r, n = N, studlab = author,
-#'                data = Woods2010, sm = "OR")
+#'   data = Woods2010, sm = "OR")
 #' net1 <- netmeta(p1, small.values = "good")
 #'
 #' # criterionA if all treatments are in the exact defined order
 #' criterionA <-
 #' condition("sameHierarchy",
-#'           c("SFC", "Salmeterol", "Fluticasone", "Placebo"))
+#'   c("SFC", "Salmeterol", "Fluticasone", "Placebo"))
 #'
 #' # criterionB respects the relative order of two or more treatments
 #' criterionB <-
 #'   condition("retainOrder",
-#'             c("SFC", "Fluticasone", "Placebo"))
+#'     c("SFC", "Fluticasone", "Placebo"))
 #'
 #' # Below we define the condition that SFC and Salmeterol are in the
 #' # first two positions.
@@ -85,8 +85,8 @@
 #' # Next we can feed the condition into nmarank to get the
 #' # probability of the selection
 #' nmarank(net1, criterionC,
-#'         text.condition =
-#'         "SFC and Salmeterol are the two best options", nsim = 100)
+#'   text.condition =
+#'     "SFC and Salmeterol are the two best options", nsim = 100)
 #'
 #' # We can further combine criteria
 #' criterionD <- criterionA %AND% (criterionB %OR% opposite(criterionC))
@@ -194,13 +194,13 @@ condition <- function(fn, ...) {
 #' @examples
 #' data("Woods2010", package = "netmeta")
 #' p1 <- pairwise(treatment, event = r, n = N, studlab = author,
-#'                data = Woods2010, sm = "OR")
+#'   data = Woods2010, sm = "OR")
 #' net1 <- netmeta(p1, small.values = "good")
 #'
 #' A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
 #' B <- condition("betterEqual", "Fluticasone", 2)
 #'
-#' nmarank(net1, A %AND% B, nsim=500)
+#' nmarank(net1, A %AND% B, nsim = 500)
 #'
 #' @seealso \code{\link{condition}}, \code{\link{nmarank}}
 #'
@@ -232,13 +232,13 @@ condition <- function(fn, ...) {
 #' @examples
 #' data("Woods2010", package = "netmeta")
 #' p1 <- pairwise(treatment, event = r, n = N, studlab = author,
-#'                data = Woods2010, sm = "OR")
+#'   data = Woods2010, sm = "OR")
 #' net1 <- netmeta(p1, small.values = "good")
 #'
 #' A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
 #' B <- condition("betterEqual", "Fluticasone", 2)
 #'
-#' nmarank(net1, A %OR% B, nsim=500)
+#' nmarank(net1, A %OR% B, nsim = 500)
 #'
 #' @seealso \code{\link{condition}}, \code{\link{nmarank}}
 #' 
@@ -246,7 +246,7 @@ condition <- function(fn, ...) {
 
 `%OR%` <- function(cond1, cond2) {
   nl <- list(id = makeID("OR"),
-             fn ="OR",
+             fn = "OR",
              arguments = {},
              operation = "combinator")
   ##
@@ -270,13 +270,13 @@ condition <- function(fn, ...) {
 #' @examples
 #' data("Woods2010", package = "netmeta")
 #' p1 <- pairwise(treatment, event = r, n = N, studlab = author,
-#'                data = Woods2010, sm = "OR")
+#'   data = Woods2010, sm = "OR")
 #' net1 <- netmeta(p1, small.values = "good")
 #'
 #' A <- condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
 #' B <- condition("betterEqual", "Fluticasone", 2)
 #'
-#' nmarank(net1, A %XOR% B, nsim=3000)
+#' nmarank(net1, A %XOR% B, nsim = 3000)
 #'
 #' @seealso \code{\link{condition}}, \code{\link{nmarank}}
 #' 
@@ -284,7 +284,7 @@ condition <- function(fn, ...) {
 
 `%XOR%` <- function(cond1, cond2) {
   nl <- list(id = makeID("XOR"),
-             fn ="XOR",
+             fn = "XOR",
              arguments = {},
              operation = "combinator")
   ##
@@ -308,11 +308,11 @@ condition <- function(fn, ...) {
 #' @examples
 #' data("Woods2010", package = "netmeta")
 #' p1 <- pairwise(treatment, event = r, n = N, studlab = author,
-#'                data = Woods2010, sm = "OR")
+#'   data = Woods2010, sm = "OR")
 #' net1 <- netmeta(p1, small.values = "good")
 #' 
 #' A = condition("retainOrder", c("Placebo", "Salmeterol", "SFC"))
-#' nmarank(net1, opposite(A), text.condition = "NOT order P-S-S", nsim=5000)
+#' nmarank(net1, opposite(A), text.condition = "NOT order P-S-S", nsim = 5000)
 #'
 #' @seealso \code{\link{condition}}, \code{\link{nmarank}}
 #' 
@@ -320,12 +320,12 @@ condition <- function(fn, ...) {
 
 opposite <- function(cond) {
   nl <- list(id = makeID("NOT"),
-             fn ="NOT",
+             fn = "NOT",
              arguments = {},
              operation = "reversor")
   ##
-  nodeout = FromListExplicit(nl, nameName="id")
-  node = makeNode(cond)
+  nodeout <- FromListExplicit(nl, nameName = "id")
+  node <- makeNode(cond)
   nodeout$AddChildNode(node)
   ##
   nodeout

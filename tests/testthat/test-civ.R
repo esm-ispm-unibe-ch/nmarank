@@ -10,15 +10,18 @@ effs <- nmarank:::nmaEffects(net1$TE.random, net1$Cov.random)
 test_that("bigger civ gives smaller probability", {
   A = condition("biggerCIV", "SFC", "Fluticasone", 2.2)
   B = condition("biggerCIV", "SFC", "Fluticasone", 0.2)
-  p1 = nmarank(net1, A)$probabilityOfSelection
-  p2 = nmarank(net1, B)$probabilityOfSelection
-  expect_lt(p1, p2)
+  pA = nmarank(net1, A)$probabilityOfSelection
+  pB = nmarank(net1, B)$probabilityOfSelection
+  expect_lt(pA, pB)
 })
 
 
-test_that("civ of 0 gives the same probability as A > B", {
+test_that("civ of 0 gives the same probability as C > D", {
   C = condition("retainOrder", c("SFC", "Fluticasone"))
   D = condition("biggerCIV", "SFC", "Fluticasone", 0)
-  p1 = nmarank(net1, C %XOR% D)
-  expect_equal(p1$probabilityOfSelection, 0)
+  set.seed(1909)
+  pC = nmarank(net1, C)$probabilityOfSelection
+  set.seed(1909)
+  pD = nmarank(net1, D)$probabilityOfSelection
+  expect_equal(pC, pD)
 })

@@ -27,9 +27,10 @@ nmarank(
 \item{TE.nma}{Either a \code{\link{netmeta}} object or a matrix
 with network estimates.}
 
-\item{condition}{Defines the conditions that should be satisfied
-by the treatments in the network. Multiple conditions can be combined with
-special operators into any decision tree. See \code{\link{condition}}.}
+\item{condition}{Defines the conditions that should be satisfied by
+the treatments in the network. Multiple conditions can be
+combined with special operators into any decision tree. See
+\code{\link{condition}}.}
 
 \item{text.condition}{Optional descriptive text for the condition.}
 
@@ -38,13 +39,13 @@ special operators into any decision tree. See \code{\link{condition}}.}
 \code{\link{netmeta}} object).}
 
 \item{pooled}{A character string indicating whether the hierarchy
-is calculated for the fixed effects (\code{"fixed"}) or random
+is calculated for the common effects (\code{"common"}) or random
 effects model (\code{"random"}). Can be abbreviated.}
 
 \item{nsim}{Number of simulations.}
 
 \item{small.values}{A character string specifying whether small
-treatment effects indicate a "good" or "bad" effect.}
+treatment effects indicate a "desirable" or "undesirable" effect.}
 
 \item{x}{A \code{\link{nmarank}} object.}
 
@@ -71,12 +72,13 @@ Specifies the frequencies of hierarchies along with their estimated
 probabilities and the probability that a specified criterion holds.
 }
 \details{
-A simulation method is used to derive the relative frequency of all possible
-hierarchies in a network of interventions. Users can also define the set of all
-possible hierarchies that satisfy a specified criterion, for example that a
-specific order among treatments is retained in the network and/or a treatment
-is in a specific position, and the sum of their frequencies constitute the
-certainty around the criterion.
+A simulation method is used to derive the relative frequency of all
+possible hierarchies in a network of interventions. Users can also
+define the set of all possible hierarchies that satisfy a specified
+criterion, for example that a specific order among treatments is
+retained in the network and/or a treatment is in a specific
+position, and the sum of their frequencies constitute the certainty
+around the criterion.
 }
 \examples{
 data("Woods2010", package = "netmeta")

@@ -5,28 +5,30 @@
 #' probabilities and the probability that a specified criterion holds.
 #'
 #' @details
-#' A simulation method is used to derive the relative frequency of all possible
-#' hierarchies in a network of interventions. Users can also define the set of all
-#' possible hierarchies that satisfy a specified criterion, for example that a
-#' specific order among treatments is retained in the network and/or a treatment
-#' is in a specific position, and the sum of their frequencies constitute the
-#' certainty around the criterion. 
+#' A simulation method is used to derive the relative frequency of all
+#' possible hierarchies in a network of interventions. Users can also
+#' define the set of all possible hierarchies that satisfy a specified
+#' criterion, for example that a specific order among treatments is
+#' retained in the network and/or a treatment is in a specific
+#' position, and the sum of their frequencies constitute the certainty
+#' around the criterion.
 #'
 #' @param TE.nma Either a \code{\link{netmeta}} object or a matrix
 #'   with network estimates.
-#' @param condition Defines the conditions that should be satisfied
-#' by the treatments in the network. Multiple conditions can be combined with
-#' special operators into any decision tree. See \code{\link{condition}}.
+#' @param condition Defines the conditions that should be satisfied by
+#'   the treatments in the network. Multiple conditions can be
+#'   combined with special operators into any decision tree. See
+#'   \code{\link{condition}}.
 #' @param text.condition Optional descriptive text for the condition.
 #' @param VCOV.nma Variance-covariance matrix for network estimates
 #'   (only considered if argument \code{TE.nma} isn't a
 #'   \code{\link{netmeta}} object).
 #' @param pooled A character string indicating whether the hierarchy
-#'   is calculated for the fixed effects (\code{"fixed"}) or random
+#'   is calculated for the common effects (\code{"common"}) or random
 #'   effects model (\code{"random"}). Can be abbreviated.
 #' @param nsim Number of simulations.
 #' @param small.values A character string specifying whether small
-#'   treatment effects indicate a "good" or "bad" effect.
+#'   treatment effects indicate a "desirable" or "undesirable" effect.
 #' @param x A \code{\link{nmarank}} object.
 #' @param nrows Number of hierarchies to print.
 #' @param digits Minimal number of significant digits for proportions,
@@ -44,8 +46,6 @@
 #' \item{TE.nma, condition, VCOV.nma,}{As defined above.}
 #' \item{pooled, nsim, small.values}{As defined above.}
 #'
-#' @import netmeta mvtnorm dplyr tibble data.tree
-#' 
 #' @examples
 #' data("Woods2010", package = "netmeta")
 #' p1 <- pairwise(treatment, event = r, n = N, studlab = author,
@@ -62,29 +62,34 @@
 #' @seealso \code{\link{condition}}, \code{\link[netmeta]{netmeta}}
 #' 
 #' @export
-nmarank <- function(TE.nma, condition=NULL, text.condition = "",
+
+
+nmarank <- function(TE.nma, condition = NULL, text.condition = "",
                     VCOV.nma = NULL, pooled,
                     nsim = 10000, small.values) {
   
+  missing.small.values <- missing(small.values)
+  ##
   if (inherits(TE.nma, "netmeta")) {
+    TE.nma <- updateversion(TE.nma)
+    ##
     if (!is.null(VCOV.nma))
       warning("Argument 'VCOV.nma' ignored for objects of type 'netmeta'.",
               call. = FALSE)
     ##
-    if (missing(small.values))
+    if (missing.small.values)
       small.values <- TE.nma$small.values
     ##
     if (missing(pooled))
-      if ((TE.nma$comb.fixed == FALSE) |
-          (TE.nma$comb.fixed == TRUE & TE.nma$comb.random == TRUE)) {
+      if (!TE.nma$common | (TE.nma$common & TE.nma$random)) {
         pooled <- "random"
         VCOV.nma <- TE.nma$Cov.random
         TE.nma <- TE.nma$TE.random
       }
       else {
-        pooled <- "fixed"
-        VCOV.nma <- TE.nma$Cov.fixed
-        TE.nma <- TE.nma$TE.fixed
+        pooled <- "common"
+        VCOV.nma <- TE.nma$Cov.common
+        TE.nma <- TE.nma$TE.common
       }
   }
   else {
@@ -93,8 +98,8 @@ nmarank <- function(TE.nma, condition=NULL, text.condition = "",
               "'TE.nma' isn't a 'netmeta' object.",
               call. = FALSE)
     ##
-    if (missing(small.values))
-      small.values <- "bad"
+    if (missing.small.values)
+      small.values <- "undesirable"
     ##
     if (missing(pooled))
       pooled <- ""
@@ -109,10 +114,11 @@ nmarank <- function(TE.nma, condition=NULL, text.condition = "",
   TEs <- effects$TE
   REs <- effects$RE
   Covs <- effects$Cov
-
   ##
-  small.values <- setchar(small.values, c("bad", "good"))
-  pooled <- setchar(pooled, c("fixed", "random", ""))
+  small.values <- setsv(small.values)
+  ##
+  pooled <- setchar(pooled, c("common", "random", "fixed", ""))
+  pooled[pooled == "fixed"] <- "common"
   ##
   trts <- rownames(TEs)
   ##
@@ -172,7 +178,7 @@ nmarank <- function(TE.nma, condition=NULL, text.condition = "",
   vMatrix <- t(as.matrix(vList))
   colnames(vMatrix)<-trts
   
-  var.theta <- as.vector(MASS::ginv(vMatrix) %*% diag(var))
+  var.theta <- as.vector(ginv(vMatrix) %*% diag(var))
   
   sample <- mvtnorm::rmvnorm(nsim, theta, diag(var.theta))
   rownames(sample) <- seq_len(nrow(sample))
@@ -257,8 +263,8 @@ print.nmarank <- function(x, text.condition = x$text.condition,
                           digits = gs("digits.prop"), ...) {
   if (x$pooled == "random")
     text.pooled <- " (random effects model)"
-  else if (x$pooled == "fixed")
-    text.pooled <- " (fixed effects model)"
+  else if (x$pooled %in% c("common", "fixed"))
+    text.pooled <- " (common effects model)"
   else
     text.pooled <- ""
   ##
